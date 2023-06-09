@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>website on Austin Barnes</title>
+    <link>https://www.cinderblock.tech/tags/website/</link>
+    <description>Recent content in website on Austin Barnes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 01 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/tags/website/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>TackleBox - GitHub Mega Repo</title>
+      <link>https://www.cinderblock.tech/blog/github-tacklebox/</link>
+      <pubDate>Mon, 01 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/github-tacklebox/</guid>
+      <description>Overview Welcome to the TackleBox, my repository that houses a diverse collection of projects and scripts.
+Check out all the goodies in this repo on GitHub.
+A Quick Peek Greetings, fellow tech enthusiasts! I thought it would be a great idea to showcase the mishmash of projects and scripts I&amp;rsquo;ve accumulated in this repository of mine, aptly named the TackleBox. Within this repository, you&amp;rsquo;ll find a wide range of content, from network automation scripts using PowerShell and Ansible to infrastructure-as-code solutions with Packer and Terraform.</description>
+    </item>
+    
+    <item>
+      <title>Hugo GitPage - Creating a free website</title>
+      <link>https://www.cinderblock.tech/blog/hugo-github-page/</link>
+      <pubDate>Sat, 08 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/hugo-github-page/</guid>
+      <description>Overview Using Github pages, Github actions, and Hugo to create a static website for free.
+Check out all of the configuration files on GitHub at the repository.
+Prerequisites Have a Domain name purchased (Will be demonstrating CloudFlare in this guide) Have a GitHub Account Steps Create a Public Repository Change Repository settings Custom Domain Name (Optional) Setup Hugo Picking a Theme Commit Create a Public Repository Go ahead and create a new repository.</description>
+    </item>
+    
+  </channel>
+</rss>

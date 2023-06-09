@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>terraform on Austin Barnes</title>
+    <link>https://www.cinderblock.tech/tags/terraform/</link>
+    <description>Recent content in terraform on Austin Barnes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 10 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OpenVPN Site-to-Site - HomeLab</title>
+      <link>https://www.cinderblock.tech/blog/openvpn-sitetosite/</link>
+      <pubDate>Thu, 10 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/openvpn-sitetosite/</guid>
+      <description>Overview A quick guide to setup and create an openvpn server that connects to a client to form a site-to-site. A solution to have a VPN into your home network without having a public IP available to you at home.
+Requirements Cloud VM with a public IP running an OpenVPN server Home VM/client running OpenVPN client Steps Create Linux VM in chosen cloud provider Setup Cloud VM OpenVPN Server Configure User Settings Configure VPN Settings Setup Home OpenVPN client Setup Client to forward IPv4 traffic and use NAT Automate connection at boot up Create Linux VM in chosen cloud provider It is important to remember to setup the firewall settings applied to the VPN to allow necessary ports.</description>
+    </item>
+    
+    <item>
+      <title>Terraform - Azure Kubernetes with Helm Charts and Cloudflare</title>
+      <link>https://www.cinderblock.tech/blog/terraform-azure-k8s-helm/</link>
+      <pubDate>Thu, 16 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-azure-k8s-helm/</guid>
+      <description>Overview Deplying helm charts in Kubernetes within Azure using the AKS service.
+Build a cluster that is running a few services Have cluster automatically scale with load Have Kubeconfig file available so it can be managed, changed, altered, destroyed, etc. Ensure Kubeconfig file is secure, and is being encrypted with traffic involved in this Create a NGINX certificate service utilizing Cloudflare&amp;rsquo;s DNS Use Traefik as a loadbalancer, and utilize ingresses for reachable internal services Prerequisites Have an Azure account if you are a student, sign up for a student account and get some free credits along side it.</description>
+    </item>
+    
+    <item>
+      <title>Terraform - Spotify Automation</title>
+      <link>https://www.cinderblock.tech/blog/terraform-spotify-multiartist/</link>
+      <pubDate>Mon, 02 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-spotify-multiartist/</guid>
+      <description>Overview Manipulating spotify playlist using Terraform, because why not?
+Check out all of the configuration files on GitHub at the repository. I have various examples of Terraform using the Spotify Provider within as well!
+Understanding the provider For all Spotify API usage with Terraform, You must either run a oauth server locally and just provide the API key, or use something online and provide all 4 necessary features (api, token_id, user, and oauth_url).</description>
+    </item>
+    
+    <item>
+      <title>&#39;Terrifying&#39; or Converting Azure Resources into Terraform Code</title>
+      <link>https://www.cinderblock.tech/blog/terraform-azure-resource-conversion/</link>
+      <pubDate>Wed, 27 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-azure-resource-conversion/</guid>
+      <description>Overview Convert existing resources in Azure to Terraform files (Terrafy/aztfy)
+Microsoft Recently released a sweet tool called aztfy. This enables you to &amp;rsquo;terrafy&amp;rsquo; existing Azure resources. This effectively allows for total conversions of existing data in Azure to be modified and updated/managed using Terraform. Whether it be for backup reasons, future management of resource changes, or cloud implmentation purposes, this could prove extremely useful. Prerequisites Have Go installed in your dev environment For Windows, go to this site and install Go Go to Microsoft&amp;rsquo;s Azure Aztfy Github Page Pull the repository to your local machine and install the go module they provide for aztfy git clone https://github.</description>
+    </item>
+    
+    <item>
+      <title>Terraform - Proxmox Virtual Machine Deploy</title>
+      <link>https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/</link>
+      <pubDate>Thu, 14 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/</guid>
+      <description>Overview Using Terraform to deploy virtual machines in Proxmox. This is designed with Proxmox Virtual Environment version 7.1 in mind.
+Check out all of the configuration files on GitHub (proxmox-deploy-vm) at the repository!
+Purpose I have a Proxmox server in my homelab, and wanted to have an easier way to spin up virtual machines on an as needed basis.
+Prequisites Have a Proxmox server Have a template made on Proxmox, in my case, I used Ubuntu Server 20.</description>
+    </item>
+    
+    <item>
+      <title>Terraform - Azure Kubernetes Deployment</title>
+      <link>https://www.cinderblock.tech/blog/terraform-azure-k8s-deploy/</link>
+      <pubDate>Mon, 04 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-azure-k8s-deploy/</guid>
+      <description>Overview Deplying a Kubernetes Cluster in Azure with the AKS service.
+Build a Kubernetes cluster in Azure Have the cluster setup to automatically scale with load Have Kubeconfig file available so it can be managed, changed, altered, destroyed, etc. Ensure Kubeconfig file is secure, and is being encrypted with traffic involved in this Check out all of the configuration files on GitHub (Azure-K8S-Deploy) at the repository!
+Steps to do this Have an Azure account; if you are a student, sign up for a student account and get some free credits along side it.</description>
+    </item>
+    
+    <item>
+      <title>Terraform - Azure Server Deploy</title>
+      <link>https://www.cinderblock.tech/blog/terraform-azure-serv-deploy/</link>
+      <pubDate>Mon, 28 Feb 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-azure-serv-deploy/</guid>
+      <description>Overview Deploy and Configure 4 Windows 2022 Datacenter Servers in Azure.
+Using Terraform in conjunction with Ansible and cloudinit: Create 4 Windows Servers Configure them to be a Primary Domain Controller, Replica Domain Controller, DHCP server, and Fileshare server Automate intial setup of the 4 servers to accept Ansible configuration from a Linux VM in Azure created VIA the Terraform deployment Check out all of the configuration files on GitHub (Azure-Serv-Deploy) at the repository!</description>
+    </item>
+    
+    <item>
+      <title>Terraform - vSphere Windows Server Deployment</title>
+      <link>https://www.cinderblock.tech/blog/terraform-vsphere-winserv-deployment/</link>
+      <pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-vsphere-winserv-deployment/</guid>
+      <description>Overview The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. To complete this project, 3 steps are taken.
+Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt Use Terraform to deploy 4 virtual machines into a vSphere environment Use Ansible to configure these 4 virtual machines as desired Check out all of the configuration files on GitHub (vSphere-WinServ-Deployment) at the repository!</description>
+    </item>
+    
+  </channel>
+</rss>

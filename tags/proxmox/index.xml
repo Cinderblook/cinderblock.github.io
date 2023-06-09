@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>proxmox on Austin Barnes</title>
+    <link>https://www.cinderblock.tech/tags/proxmox/</link>
+    <description>Recent content in proxmox on Austin Barnes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 30 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/tags/proxmox/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Packer - Proxmox Ubuntu Server Creation</title>
+      <link>https://www.cinderblock.tech/blog/packer-proxmox-ubuntuserv/</link>
+      <pubDate>Sat, 30 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/packer-proxmox-ubuntuserv/</guid>
+      <description>Overview Using Packer to create a Ubunut 22.04 server image within Proxmox. This is designed with Proxmox Virtual Environment version 7.1 in mind.
+Check out all of the configuration files on GitHub at the repository.
+Prerequisites Must have Packer configured on your machine, DHCP running on the network, and a Proxmox server available (Preferrable to be version 7.1) Have a Proxmox user created with proper privledges for Terraform (See how to create the user here) Ubuntu Server 22.</description>
+    </item>
+    
+    <item>
+      <title>Terraform - Proxmox Virtual Machine Deploy</title>
+      <link>https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/</link>
+      <pubDate>Thu, 14 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/</guid>
+      <description>Overview Using Terraform to deploy virtual machines in Proxmox. This is designed with Proxmox Virtual Environment version 7.1 in mind.
+Check out all of the configuration files on GitHub (proxmox-deploy-vm) at the repository!
+Purpose I have a Proxmox server in my homelab, and wanted to have an easier way to spin up virtual machines on an as needed basis.
+Prequisites Have a Proxmox server Have a template made on Proxmox, in my case, I used Ubuntu Server 20.</description>
+    </item>
+    
+  </channel>
+</rss>
