@@ -19,7 +19,7 @@ Using Packer to create a Ubunut 22.04 server image within Proxmox. This is desig
 ## Prerequisites 
 
 1. Must have [Packer](https://learn.hashicorp.com/tutorials/packer/get-started-install-cli) configured on your machine, DHCP running on the network, and a Proxmox server available (Preferrable to be version 7.1)
-2. Have a Proxmox user created with proper privledges for Terraform ([See how to create the user here](https://www.cinderblook.com/blog/terraform-proxmox-vm-deploy/))
+2. Have a Proxmox user created with proper privledges for Terraform ([See how to create the user here](https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/))
 3. Ubuntu Server 22.04 Iso uploaded to your Proxmox server
 
 ## Getting proper files setup

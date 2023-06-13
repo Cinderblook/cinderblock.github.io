@@ -1,5 +1,5 @@
 # Personal Site
-cinderblok.github.io & www.cinderblock.tech
+cinderblock.github.io & www.cinderblock.tech
 
 # How to install Hugo conditioned for POSTCSS
 1. Commands to Setup npm versioning (Should be V.14)

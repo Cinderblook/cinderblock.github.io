@@ -7,9 +7,9 @@ keywords: ["about-us", "about-hugo", "contact"]
 type: about
 ---
 
-# About Austin Barnes and Cinderblook.com
+# About Austin Barnes and Cinderblock.tech
 
-Welcome to Cinderblook.com! My name is Austin Barnes, and this website is my personal side project where I share a variety of content. I'm a tech enthusiast with a passion for exploring different aspects of technology. In my professional life, I work as an Infrastructure Engineer at Battelle. Prior to that, I gained experience as a Linux Support for Pennsylvania College of Technology and as a Network Technician for Jersey Shore Area School District. I hold a Bachelor's degree in Network Administration and Engineering from Pennsylvania College of Technology.
+Welcome to Cinderblock.tech! My name is Austin Barnes, and this website is my personal side project where I share a variety of content. I'm a tech enthusiast with a passion for exploring different aspects of technology. In my professional life, I work as an Infrastructure Engineer at Battelle. Prior to that, I gained experience as a Linux Support for Pennsylvania College of Technology and as a Network Technician for Jersey Shore Area School District. I hold a Bachelor's degree in Network Administration and Engineering from Pennsylvania College of Technology.
 
 ## Interests
 
