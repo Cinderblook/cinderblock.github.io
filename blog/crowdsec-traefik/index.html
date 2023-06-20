@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage"><head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="/favicon.svg">
+
+  <title>
+    Crowdsec &amp; Traefik: Automating Security in Your Homelab - Austin Barnes
+  </title>
+  <meta name="description" content="Exploring how to utilize Crowdsec with Traefik for enhanced home network security." />
+  <meta name="author" content="Austin Barnes" />
+  <meta name="generator" content="Hugo 0.114.0"><link
+    rel="stylesheet"
+    href="https://www.cinderblock.tech/css/styles.min.4c4284cce4f1e6121443c34e1affc66a4652d581177c59a97bd6ea162a1b07fa.css"
+    integrity="sha256-TEKEzOTx5hIUQ8NOGv/GakZS1YEXfFmpe9bqFiobB/o="
+  />
+  
+  
+
+  <meta property="og:title" content="Crowdsec &amp; Traefik: Automating Security in Your Homelab" />
+<meta property="og:description" content="Exploring how to utilize Crowdsec with Traefik for enhanced home network security." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.cinderblock.tech/blog/crowdsec-traefik/" /><meta property="article:section" content="blog" />
+<meta property="article:published_time" content="2023-06-20T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-06-20T00:00:00+00:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Crowdsec &amp; Traefik: Automating Security in Your Homelab"/>
+<meta name="twitter:description" content="Exploring how to utilize Crowdsec with Traefik for enhanced home network security."/>
+
+  <meta itemprop="name" content="Crowdsec &amp; Traefik: Automating Security in Your Homelab">
+<meta itemprop="description" content="Exploring how to utilize Crowdsec with Traefik for enhanced home network security."><meta itemprop="datePublished" content="2023-06-20T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2023-06-20T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1425">
+<meta itemprop="keywords" content="traefik,networking,github,crowdsec,homelab," />
+</head>
+<body class="dark:bg-gray-800 dark:text-white relative flex flex-col min-h-screen"><header class="container flex justify-between md:justify-between gap-4 flex-wrap p-6 mx-auto relative">
+  <a href="https://www.cinderblock.tech/" class="capitalize font-extrabold text-2xl">
+    
+    Austin Barnes
+    
+  </a>
+  <button class="mobile-menu-button md:hidden">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+    </svg>
+  </button>
+  <ul class="mobile-menu absolute z-10 px-6 pb-6 md:p-0 top-full left-0 w-full md:w-auto md:relative hidden md:flex flex-col md:flex-row items-end md:items-center gap-4 lg:gap-6 bg-white dark:bg-gray-800">
+
+    
+    <li><a href="/blog">Blog</a></li>
+    
+    <li><a href="/page/about/">About</a></li>
+    
+    <li><a href="/tags">Tags</a></li>
+    
+    <li><a href="https://github.com/Cinderblook">Github</a></li>
+    
+    <li><a href="/page/sites/">Sites</a></li>
+    
+
+    
+
+    
+    <li class="grid place-items-center">
+      <span class="open-search inline-block cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <circle cx="10" cy="10" r="7" />
+          <line x1="21" y1="21" x2="15" y2="15" />
+        </svg>
+      </span>
+    </li>
+    
+
+    
+    <li class="grid place-items-center">
+      <span class="toggle-dark-mode inline-block cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <circle cx="12" cy="12" r="3" />
+          <line x1="12" y1="5" x2="12" y2="5.01" />
+          <line x1="17" y1="7" x2="17" y2="7.01" />
+          <line x1="19" y1="12" x2="19" y2="12.01" />
+          <line x1="17" y1="17" x2="17" y2="17.01" />
+          <line x1="12" y1="19" x2="12" y2="19.01" />
+          <line x1="7" y1="17" x2="7" y2="17.01" />
+          <line x1="5" y1="12" x2="5" y2="12.01" />
+          <line x1="7" y1="7" x2="7" y2="7.01" />
+        </svg>
+      </span>
+    </li>
+    
+  </ul>
+</header>
+<main class="flex-1">
+  
+  
+
+  
+  <div class="relative max-w-5xl mx-auto px-4">
+    <img src="/covers/Crowdsec-traefik.png" class="rounded-lg shadow-sm w-full object-contain" />
+    <div class="absolute top-4 right-8 rounded shadow bg-white text-gray-900 dark:bg-gray-900 dark:text-white px-2 py-0.5">
+      
+  
+    June 20, 2023
+  
+
+
+    </div>
+  </div>
+  
+
+  <article class="prose lg:prose-lg mx-auto my-8 dark:prose-dark px-4">
+
+    <h1 class="text-2xl font-bold mb-2">Crowdsec &amp; Traefik: Automating Security in Your Homelab</h1>
+    <h5 class="text-sm flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <rect x="4" y="5" width="16" height="16" rx="2" />
+        <line x1="16" y1="3" x2="16" y2="7" />
+        <line x1="8" y1="3" x2="8" y2="7" />
+        <line x1="4" y1="11" x2="20" y2="11" />
+        <rect x="8" y="15" width="2" height="2" />
+      </svg>
+      Posted on 
+  
+    June 20, 2023
+  
+
+
+      
+        &nbsp;&bull;&nbsp;
+      
+      <svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <circle cx="12" cy="12" r="9" />
+        <polyline points="12 7 12 12 15 15" />
+      </svg>
+      7&nbsp;minutes
+      &nbsp;&bull;
+      <svg xmlns="http://www.w3.org/2000/svg" class="mx-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <line x1="3" y1="6" x2="3" y2="19" />
+        <line x1="12" y1="6" x2="12" y2="19" />
+        <line x1="21" y1="6" x2="21" y2="19" />
+      </svg>
+      1425&nbsp;words
+      
+    </h5>
+
+    <h1 id="crowdsec--traefik-automating-security-in-your-homelab">Crowdsec &amp; Traefik: Automating Security in Your Homelab</h1>
+<p>Hello there! Today, I&rsquo;m thrilled to introduce you to <strong>Crowdsec</strong>, an open-source Security threat intelligence project that&rsquo;s perfect for boosting security in your homelab.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before we embark on our journey into a safer network, let&rsquo;s check off these prerequisites:</p>
+<ol>
+<li>Prior experience with networking and a good understanding of network protocols.</li>
+<li>Some exposure to Docker as we&rsquo;ll be using Docker-Compose for the setup.</li>
+<li>An external service in your homelab that you&rsquo;re eager to fortify!</li>
+</ol>
+<p>Ready? Let&rsquo;s dive in!</p>
+<h2 id="setting-up-traefik">Setting up Traefik</h2>
+<p>Setting up the Docker container for Traefik is a breeze, provided you have a couple of files handy.</p>
+<blockquote>
+<p>Note: In this setup, we&rsquo;ll be using Cloudflare as the certificate handler via Let&rsquo;s Encrypt. Although I won&rsquo;t go into details on this here, you&rsquo;ll need a domain and API access to your DNS Zones.</p>
+</blockquote>
+<p>First, let&rsquo;s create a directory named <code>traefik</code> and within it, two more directories, <code>logs/</code> and <code>data/</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir traefik
+</span></span><span style="display:flex;"><span><span style="color:#8be9fd;font-style:italic">cd</span> traefik
+</span></span><span style="display:flex;"><span>mkdir logs/ data/
+</span></span></code></pre></div><p>Now, in the traefik directory, create a new docker-compose.yml file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nano docker-comopse.yml
+</span></span></code></pre></div><p>Input the following configuration:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#ff79c6">version</span>: <span style="color:#f1fa8c">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">traefik</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">image</span>: traefik:latest
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">container_name</span>: traefik
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">restart</span>: unless-stopped
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">security_opt</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ff79c6">no</span>-new-privileges:true
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">networks</span>:
+</span></span><span style="display:flex;"><span>      - proxy
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;80:80&#34;</span> 
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;443:443&#34;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">environment</span>:
+</span></span><span style="display:flex;"><span>      - CF_API_EMAIL=${CF_API_EMAIL}
+</span></span><span style="display:flex;"><span>      - CF_API_KEY=${CF_API_KEY}
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">volumes</span>:
+</span></span><span style="display:flex;"><span>      - /etc/localtime:/etc/localtime:ro
+</span></span><span style="display:flex;"><span>      - /var/run/docker.sock:/var/run/docker.sock:ro
+</span></span><span style="display:flex;"><span>      - ./logs/traefik-access.log:/var/log/traefik
+</span></span><span style="display:flex;"><span>      - ./data/traefik.yml:/traefik.yml:ro
+</span></span><span style="display:flex;"><span>      - ./data/acme.json:/acme.json
+</span></span><span style="display:flex;"><span>      - ./data/config.yml:/config.yml:ro
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">labels</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.enable=true&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik.entrypoints=http&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik.rule=Host(`traefik.domain.com`)&#34;</span> <span style="color:#6272a4">#Domain-Here</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.middlewares.traefik-auth.basicauth.users=${BASICAUTHUSER}&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#6272a4"># Generate BASID_AUTH_PASS: echo $(htpasswd -nb &#34;&lt;USER&gt;&#34; &#34;&lt;PASSWORD&gt;&#34;) | sed -e s/\\$/\\$\\$/g</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik.middlewares=traefik-https-redirect&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.entrypoints=https&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.rule=Host(`traefik.domain.com`)&#34;</span> <span style="color:#6272a4">#Domain-Here</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.middlewares=traefik-auth&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.tls=true&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.tls.certresolver=cloudflare&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.tls.domains[0].main=.domain.com&#34;</span> <span style="color:#6272a4">#Domain-Here</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.tls.domains[0].sans=*..domain.com&#34;</span> <span style="color:#6272a4">#Domain-Here</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;traefik.http.routers.traefik-secure.service=api@internal&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">proxy</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">external</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4">#Ensure to setup docker netowork (`docker network create proxy`)</span>
+</span></span></code></pre></div><p>With that created, navigate into your data/ directory  and create config.yml</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8be9fd;font-style:italic">cd</span> data/
+</span></span><span style="display:flex;"><span>nano config.yml
+</span></span></code></pre></div><p>Fill it with the following: (This will be updated again later; I left a snippet in there about pi-hole, for refernence on how to setup a HTTP / HTTPS router service)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#ff79c6">http</span>:
+</span></span><span style="display:flex;"><span> <span style="color:#6272a4">#region routers </span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">routers</span>:
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Pihole http</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">pihole</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">entryPoints</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f1fa8c">&#34;http&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">rule</span>: <span style="color:#f1fa8c">&#34;Host(`pihole.domain.com`)&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">middlewares</span>:
+</span></span><span style="display:flex;"><span>        - https-redirectscheme
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">service</span>: pihole
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Pihole https</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">pihole-secure</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">entryPoints</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f1fa8c">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">rule</span>: <span style="color:#f1fa8c">&#34;Host(`pihole.domain.com`)&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">middlewares</span>:
+</span></span><span style="display:flex;"><span>        - default-headers
+</span></span><span style="display:flex;"><span>        - addprefix-admin
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">tls</span>: {}
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">service</span>: pihole          
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4">#region services</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">services</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">passHostHeader</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Pihole Loadbalancer</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">pihole</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">loadBalancer</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">servers</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#ff79c6">url</span>: <span style="color:#f1fa8c">&#34;http://pihole-ip-here:80&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">passHostHeader</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4">#endregion</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">middlewares</span>:
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Prefix all traffic to admin page</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">addprefix-admin</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">addPrefix</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">prefix</span>: <span style="color:#f1fa8c">&#34;/admin&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Redirect all http traffic to https</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">https-redirectscheme</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">redirectScheme</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">scheme</span>: https
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">permanent</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Add default headers for redirection</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">default-headers</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">headers</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">frameDeny</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">browserXssFilter</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">contentTypeNosniff</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">forceSTSHeader</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">stsIncludeSubdomains</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">stsPreload</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">stsSeconds</span>: <span style="color:#bd93f9">15552000</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">customFrameOptionsValue</span>: SAMEORIGIN
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">customRequestHeaders</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#ff79c6">X-Forwarded-Proto</span>: https
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Whitelist all private IP addresses</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">default-whitelist</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">ipWhiteList</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">sourceRange</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;10.0.0.0/8&#34;</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;192.168.0.0/16&#34;</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;172.16.0.0/12&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Used for headers</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">secured</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">chain</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">middlewares</span>:
+</span></span><span style="display:flex;"><span>          - default-whitelist
+</span></span><span style="display:flex;"><span>          - default-headers
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">tcp</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">routers</span>:
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Whitelist all private IP addresses</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">middlewares</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">default-whitelist</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">ipWhiteList</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">sourceRange</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;10.0.0.0/8&#34;</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;192.168.0.0/16&#34;</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;172.16.0.0/12&#34;</span>
+</span></span></code></pre></div><p>While still in the same directory, create traefik.yml</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nano traefik.yml
+</span></span></code></pre></div><p>and fill it with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#ff79c6">api</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">dashboard</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">debug</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">entryPoints</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">http</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">address</span>: <span style="color:#f1fa8c">&#34;:80&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">http</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">redirections</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">entryPoint</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#ff79c6">to</span>: <span style="color:#f1fa8c">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#ff79c6">scheme</span>: <span style="color:#f1fa8c">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">https</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">address</span>: <span style="color:#f1fa8c">&#34;:443&#34;</span>
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">serversTransport</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">insecureSkipVerify</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">providers</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">docker</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">endpoint</span>: <span style="color:#f1fa8c">&#34;unix:///var/run/docker.sock&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">exposedByDefault</span>: <span style="color:#ff79c6">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">file</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">filename</span>: /config.yml
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">certificatesResolvers</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">cloudflare</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">acme</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">email</span>: ${CF_API_EMAIL} <span style="color:#6272a4"># Email of your cloudflare account here</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">storage</span>: acme.json
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">dnsChallenge</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">provider</span>: cloudflare
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">resolvers</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;1.1.1.1:53&#34;</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#f1fa8c">&#34;1.0.0.1:53&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">log</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">level</span>: INFO
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">filePath</span>: <span style="color:#f1fa8c">&#34;/var/log/traefik/traefik.log&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">accessLog</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">filePath</span>: <span style="color:#f1fa8c">&#34;/var/log/traefik/access.log&#34;</span>
+</span></span></code></pre></div><p>Now navigate back to the root ./traefik folder, and re-create the container</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8be9fd;font-style:italic">cd</span> ../
+</span></span><span style="display:flex;"><span>docker-compose up -d --force-recreate
+</span></span></code></pre></div><h3 id="testing-traefik">Testing Traefik</h3>
+<p>Don&rsquo;t take any further steps until you are certain traefik is working. Check the the log file, ./traefik/logs/traefik.log with <code>tail -f traefik.log</code> for errors, and work from there.</p>
+<h2 id="setting-up-crowdsec">Setting up Crowdsec</h2>
+<p>With our traefik container running and doing all of its proxy magic, now we can setup our security item. Crowdsec. navigate back to your root folder beneath ./traefik and make a new directory titled crowdsec, with a config/ folder, and a docker-compose.yml file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir crowdsec
+</span></span><span style="display:flex;"><span><span style="color:#8be9fd;font-style:italic">cd</span> crowdsec
+</span></span><span style="display:flex;"><span>mkdir config
+</span></span><span style="display:flex;"><span>nano docker-compose.yml
+</span></span></code></pre></div><p>Within this docker-compose file put the following for now:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#ff79c6">version</span>: <span style="color:#f1fa8c">&#39;3.8&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">crowdsec</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">image</span>: crowdsecurity/crowdsec:latest
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">container_name</span>: crowdsec
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">environment</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">GID</span>: <span style="color:#f1fa8c">&#34;${GID-1000}&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">COLLECTIONS</span>: <span style="color:#f1fa8c">&#34;crowdsecurity/linux crowdsecurity/traefik&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">volumes</span>:
+</span></span><span style="display:flex;"><span>      - ./config/acquis.yaml:/etc/crowdsec/acquis.yaml
+</span></span><span style="display:flex;"><span>      - ./db:/var/lib/crowdsec/data/
+</span></span><span style="display:flex;"><span>      - ./config:/etc/crowdsec/
+</span></span><span style="display:flex;"><span>      - ../traefik/logs/traefik-access.log:/var/log/traefik/:ro
+</span></span><span style="display:flex;"><span>      <span style="color:#6272a4"># This volume points back to the traefik logs we are writing and storing locally</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;8083:8080&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">networks</span>:
+</span></span><span style="display:flex;"><span>      - proxy
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">restart</span>: unless-stopped
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">proxy</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">external</span>: <span style="color:#ff79c6">true</span>
+</span></span></code></pre></div><p>Next, create  config/acquis.yaml. This houses the config telling Crowdsec to look for the Traefik Logs.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nano config/acquis.yml
+</span></span></code></pre></div><p>(<em>NOTE: This must be a .yaml and not .yml</em>)
+Fill it with the following config:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#ff79c6">filenames</span>:
+</span></span><span style="display:flex;"><span>  - /var/log/traefik/*
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">labels</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">type</span>: traefik
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">filenames</span>:
+</span></span><span style="display:flex;"><span>  - /var/log/auth.log
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">labels</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">type</span>: syslog  
+</span></span></code></pre></div><p>While in ./crowdsec, spin it up</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f1fa8c">`</span>docker-compose up -d --force-recreate<span style="color:#f1fa8c">`</span>
+</span></span></code></pre></div><h3 id="testing-crowdsec">Testing Crowdsec</h3>
+<p>Again, it is critical you save yourself some time and ensure the service is working as intended before moving forward. Trust me.</p>
+<p>Check first with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span> <span style="color:#f1fa8c">`</span>docker <span style="color:#8be9fd;font-style:italic">exec</span> crowdsec cscli metrics<span style="color:#f1fa8c">`</span>
+</span></span></code></pre></div><p>Search for the top of the result, and check that crowdsec can see and is parsing files from <code>/var/log/traefik/</code></p>
+<p>If it is, you can continue! Otherwise look back and just double check syntax and what not.</p>
+<h2 id="integrating-crowdsec-and-traefik">Integrating Crowdsec and Traefik</h2>
+<p>Run a couple of commands into the crowdsec docker container to update it, and bring versioning into line of our collections in use from the docker-compose file, &lsquo;crowdsecurity/linux&rsquo; &lsquo;crowdsecurity/traefik&rsquo;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker <span style="color:#8be9fd;font-style:italic">exec</span> crowdsec cscli hub update <span style="color:#ff79c6">&amp;&amp;</span> docker <span style="color:#8be9fd;font-style:italic">exec</span> crowdsec cscli hub upgrade
+</span></span></code></pre></div><p>If you wish, you can automate this, to ensure constant updates between the local crowdsec, and the remote updates from the repos. I&rsquo;ll be keeping it up-to-date by using ansible-semaphore.</p>
+<h3 id="automating-updates-with-cron">Automating Updates with Cron</h3>
+<p>Run the <code>crontab -e</code> command. Select <code>1</code> for /bin/nano, and at the bottom put in</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span> <span style="color:#bd93f9">0</span> 0,6,12,18 * * * docker <span style="color:#8be9fd;font-style:italic">exec</span> crowdsec cscli hub update <span style="color:#ff79c6">&amp;&amp;</span> docker <span style="color:#8be9fd;font-style:italic">exec</span> crowdsec cscli hub upgrade
+</span></span></code></pre></div><p>This will update and upgrade the hub every 6 hours.</p>
+<h2 id="enhancing-crowdsec-with-a-bouncer">Enhancing Crowdsec with a Bouncer</h2>
+<p>We will be using a bouncer designed for traefik (Shout out to: fbonalair for creating this: <a href="https://github.com/fbonalair/traefik-crowdsec-bouncer)">https://github.com/fbonalair/traefik-crowdsec-bouncer)</a>.</p>
+<p>Go back into your traefik folder, and <code>nano docker-compose.yml</code>, add the following to your file to have it start up right after your crowdsec container:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span>  <span style="color:#ff79c6">bouncer-traefik</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">image</span>: docker.io/fbonalair/traefik-crowdsec-bouncer:latest
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">container_name</span>: bouncer-traefik
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">environment</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">CROWDSEC_BOUNCER_API_KEY</span>: ${bouncer-api-key}
+</span></span><span style="display:flex;"><span>      <span style="color:#6272a4"># Get this api key by running `docker exec crowdsec cscli bouncers add bouncer-traefik`</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">CROWDSEC_AGENT_HOST</span>: crowdsec:8080
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">GIN_MODE</span>: release
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f1fa8c">&#34;8082:8080&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">networks</span>:
+</span></span><span style="display:flex;"><span>      - proxy <span style="color:#6272a4"># same network as traefik + crowdsec</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">depends_on</span>:
+</span></span><span style="display:flex;"><span>      - crowdsec
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">restart</span>: unless-stopped
+</span></span></code></pre></div><p>Once you have your API key in the file, run <code>docker-compouse up -d --force-recreate</code> and have it create the bouncer.</p>
+<h2 id="update-traefik-to-support-the-bouncer">Update Traefik to support the bouncer</h2>
+<p>Now, navigate back into the Traefik folder and edit the <code>data/config.yml</code> file. Add the following to the <code>http: -&gt; services: -&gt; middlewares:</code> section:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span>    <span style="color:#ff79c6">crowdsec-bouncer</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">forwardauth</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">address</span>: http://http://bouncer-traefik:8080/api/v1/forwardAuth
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">trustForwardHeader</span>: <span style="color:#ff79c6">true</span>
+</span></span></code></pre></div><p>You must also add this middleware to your <code>config/traefik.yml</code> file, causing the redirect out to the bouncer at the time of access:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#ff79c6">api</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">dashboard</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">debug</span>: <span style="color:#ff79c6">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">entryPoints</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">http</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">address</span>: <span style="color:#f1fa8c">&#34;:80&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">http</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">redirections</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff79c6">entryPoint</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#ff79c6">to</span>: <span style="color:#f1fa8c">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#ff79c6">scheme</span>: <span style="color:#f1fa8c">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">https</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">address</span>: <span style="color:#f1fa8c">&#34;:443&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">http</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#ff79c6">middlewares</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f1fa8c">&#34;crowdsec-bouncer@file&#34;</span>
+</span></span></code></pre></div><p>With that done, run <code>docker-compose up -d --force-recreate</code> for traefik.</p>
+<h2 id="reaping-the-rewards-enrolling-crowdsec">Reaping the Rewards: Enrolling CrowdSec</h2>
+<p>Now that crowdsec is working, lets enroll our client. This will add benefits with a overall a nice dashboard to manage it</p>
+<ul>
+<li>Easily monitoring alerts</li>
+<li>Seeing activity going on</li>
+<li>Bounces occuring</li>
+</ul>
+<ol>
+<li>Navigate to <a href="https://app.crowdsec.net">CrowdSec&rsquo;s website</a></li>
+<li>Create an account.</li>
+<li>Search for &lsquo;Enroll your crowdsec security engine!&rsquo; and copy the code at the end of it (see picture below).</li>
+</ol>
+<ul>
+<li><img src="/examples/crowdsec-traefik-example-01.png" alt="crowdsec-traefik-01" title="crowdsec-traefik-01"></li>
+</ul>
+<ol start="4">
+<li>Back on your Crowdsec host, run</li>
+</ol>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker <span style="color:#8be9fd;font-style:italic">exec</span> crowdsec cscli console enroll code-pasted-here
+</span></span></code></pre></div></li>
+</ul>
+<ol start="5">
+<li>Once pasted, run</li>
+</ol>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker restart crowdsec
+</span></span></code></pre></div></li>
+</ul>
+<ol start="6">
+<li>Go back to <a href="https://app.crowdsec.net">CrowdSec&rsquo;s website</a> and accept the instance</li>
+<li>Enjoy your management dashboard</li>
+</ol>
+<h3 id="notable-benefits-of-enrolling">Notable benefits of Enrolling:</h3>
+<ul>
+<li>You can receive notifications when your bouncers get updates.</li>
+<li>You have the ability to sync your scenarios across all of your bouncers, making management a breeze.</li>
+</ul>
+<h2 id="exploring-more">Exploring More</h2>
+<p>Interested in taking your security measures to another level?</p>
+<ul>
+<li>Figure out how to add Authelia behind your crowdsec and traefik containers to enhance security a step further with multi-factor web access for your apps. More info <a href="https://www.authelia.com/">here</a>.</li>
+<li>Check out this plugin for Traefik: <a href="https://plugins.traefik.io/plugins/6335346ca4caa9ddeffda116/crowdsec-bouncer-traefik-plugin">Crowdsec Bouncer Traefik Plugin</a></li>
+</ul>
+<h2 id="useful-crowdsec-commands">Useful Crowdsec commands</h2>
+<p>To easily execute the following commands, you can use this to exec into your crowdsec container.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker <span style="color:#8be9fd;font-style:italic">exec</span> -it crowdsec /bin/bash
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#6272a4"># See all parsers and scenarios deployed</span>
+</span></span><span style="display:flex;"><span>cscli hub list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># See all decisions that have occured </span>
+</span></span><span style="display:flex;"><span>cscli decisions list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># See all alerts at a glance</span>
+</span></span><span style="display:flex;"><span>cscli alerts list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Block a specific IP</span>
+</span></span><span style="display:flex;"><span>cscli decisions add --ip 1.2.3.4
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># Unblock a specific IP</span>
+</span></span><span style="display:flex;"><span>cscli decisions delete -i 1.2.3.4
+</span></span></code></pre></div><h2 id="useful-resources">Useful Resources</h2>
+<p>Here are some useful resources for further exploration:</p>
+<ul>
+<li><a href="https://www.crowdsec.net/">Crowdsec site</a></li>
+<li><a href="https://traefik.io/">Traefik site</a></li>
+<li><a href="https://github.com/fbonalair/traefik-crowdsec-bouncer">traefik-crowdsec-bouncer github</a></li>
+<li><a href="https://github.com/Cinderblook/tacklebox/tree/">My GitHub Repository</a></li>
+<li><a href="https://docs.ibracorp.io/crowdsec/">IBRACORP</a></li>
+</ul>
+
+  </article><div class="bg-blue-100 dark:bg-gray-900">
+  <div class="container px-6 py-12 mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <div>
+      <div class="text-2xl font-bold mb-2">Follow me</div>
+      <p class="opacity-60">I put a little bit of everything on here, so follow along in my journey if you wish</p>
+    </div>
+    <ul class="flex justify-center gap-4">
+      
+      
+      <li>
+        <a
+          href="https://www.linkedin.com/in/austin-barnes-03869218a/"
+          target="_blank"
+          rel="noopener"
+          aria-label="LinkedIn"
+          class="p-2 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <line x1="8" y1="11" x2="8" y2="16" />
+            <line x1="8" y1="8" x2="8" y2="8.01" />
+            <line x1="12" y1="16" x2="12" y2="11" />
+            <path d="M16 16v-3a2 2 0 0 0 -4 0" />
+          </svg>
+        </a>
+      </li>
+      
+      
+      
+      <li>
+        <a
+          href="https://github.com/Cinderblook"
+          target="_blank"
+          rel="noopener"
+          aria-label="GitHub"
+          class="p-2 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+              d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"
+            />
+          </svg>
+        </a>
+      </li>
+      
+      
+      
+      <li>
+        <a
+          href="https://www.buymeacoffee.com/cinderblook"
+          target="_blank"
+          rel="noopener"
+          aria-label="coffeescript"
+          class="p-2 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4.645 7.472c2.1.53 4.779.8 8.008.8 3.299 0 5.918-.27 8.008-.8 2.23-.52 3.299-1.22 3.299-1.88 0-.47-.48-.93-1.35-1.28.2.13.35.35.35.59 0 .67-1.01 1.22-3.039 1.68-1.88.41-4.279.7-7.198.7-2.82 0-5.329-.29-7.138-.68-1.95-.48-2.97-1-2.97-1.68 0-.28.13-.52.52-.8-1.22.47-1.88.87-1.88 1.47.07.68 1.16 1.36 3.39 1.88zm4.689-2.16c2.27-.2 2.929-1.659 5.588-1.899 1.31-.1 2.14.16 2.23.62.08.43-.57.72-1.36.78-1.09.11-1.54-.28-1.63-.65-.81.09-.94.43-.9.67.09.46 1.07.92 2.75.76 1.9-.15 2.54-.9 2.38-1.65-.2-.98-1.66-1.8-4.28-1.55-3.359.3-3.339 1.86-5.628 2.05-.94.09-1.46-.13-1.55-.5-.06-.37.4-.55.94-.59.5-.05 1.11.04 1.4.2.21-.11.28-.22.26-.35-.1-.35-.79-.5-1.66-.44-1.7.15-1.7.91-1.64 1.25.17.87 1.48 1.45 3.1 1.3zm11.417 3.84c-2.1.49-4.779.809-8.008.809-3.3 0-5.989-.34-8.078-.8-1.88-.48-2.88-1.01-3.23-1.56.18 1.23.49 2.42.89 3.55-.48.3-.91.67-1.3 1.17a4.519 4.519 0 00-1.019 3.098 3.6 3.599 0 001.42 2.62c.87.68 1.81.88 2.879.68.41-.07.87-.28 1.29-.42-.88 0-1.62-.28-2.36-.87a3.55 3.549 0 01-1.49-2.42c-.2-.94 0-1.81.53-2.579.12-.15.25-.28.39-.4.3.73.62 1.45.98 2.12.81 1.23 1.62 2.299 2.43 3.459.35.68.58 1.35.74 2.019a3.899 3.899 0 002.229 1.5c1.15.4 2.35.58 3.579.51h.13a10.197 10.197 0 003.689-.52 4.179 4.179 0 002.16-1.49h.07c.13-.67.35-1.34.67-2.02.799-1.17 1.619-2.229 2.419-3.458A20.995 20.993 0 0024 7.612c-.43.6-1.44 1.13-3.25 1.54z"/></svg>
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <path d="M8 9h1l3 3l3 -3h1" />
+            <line x1="8" y1="15" x2="10" y2="15" />
+            <line x1="14" y1="15" x2="16" y2="15" />
+            <line x1="9" y1="9" x2="9" y2="15" />
+            <line x1="15" y1="9" x2="15" y2="15" />
+          </svg>
+        </a>
+      </li>
+      
+      
+      
+      
+      
+      <li>
+        <a
+          href="https://www.instagram.com/austin_barnesz/"
+          target="_blank"
+          rel="noopener"
+          aria-label="Instagram"
+          class="p-2 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-brand-instagram"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" />
+            <circle cx="12" cy="12" r="9" />
+            <path d="M10 9l5 3l-5 3z" />
+          </svg>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+    </main><footer class="container p-6 mx-auto flex justify-between items-center">
+  <span class="text-sm font-light">
+    
+    Copyright © 2021 - Austin Barnes · All rights reserved
+    
+  </span>
+  <span onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="p-1 cursor-pointer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5"
+      stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M18 15l-6 -6l-6 6h12" />
+    </svg>
+  </span>
+</footer>
+
+<div class="search-ui absolute top-0 left-0 w-full h-full bg-white dark:bg-gray-800 hidden">
+  <div class="container max-w-3xl mx-auto p-12">
+    <div class="relative">
+      <div class="my-4 text-center text-2xl font-bold">Search</div>
+
+      <span class="p-2 absolute right-0 top-0 cursor-pointer close-search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </span>
+    </div>
+
+    <input type="search" class="py-2 px-3 w-full dark:text-black border dark:border-transparent"
+      placeholder="Enter search query" />
+
+    <div class="search-results text-lg font-medium my-4 hidden">Results</div>
+    <ul class="search-list my-2">
+
+    </ul>
+
+    <div class="no-results text-center my-8 hidden">
+      <div class="text-xl font-semibold mb-2">No results found</div>
+      <p class="font-light text-sm">Try adjusting your search query</p>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script src="https://www.cinderblock.tech/js/scripts.min.js"></script>
+
+
+
+
+
+
+<script>
+  
+  const darkmode = document.querySelector('.toggle-dark-mode');
+  function toggleDarkMode() {
+    if (document.documentElement.classList.contains('dark')) {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('darkmode', 'light')
+    } else {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('darkmode', 'dark')
+    }
+  }
+  if (darkmode) {
+    darkmode.addEventListener('click', toggleDarkMode);
+  }
+
+  const darkStorage = localStorage.getItem('darkmode');
+  const isBrowserDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (!darkStorage && isBrowserDark) {
+    document.documentElement.classList.add('dark');
+  }
+
+  if (darkStorage && darkStorage === 'dark') {
+    toggleDarkMode();
+  }
+</script>
+
+
+<script>
+  const mobileMenuButton = document.querySelector('.mobile-menu-button')
+  const mobileMenu = document.querySelector('.mobile-menu')
+  function toggleMenu() {
+    mobileMenu.classList.toggle('hidden');
+    mobileMenu.classList.toggle('flex');
+  }
+  if(mobileMenu && mobileMenuButton){
+    mobileMenuButton.addEventListener('click', toggleMenu)
+  }
+</script>
+</body>
+</html>
