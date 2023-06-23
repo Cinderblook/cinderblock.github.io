@@ -4,7 +4,7 @@ title: "Rancher behind Traefik - K3S"
 description: "Running Traefik, Rancher, and Mysql containers, then connecting a lightweight kubernetes cluster to it for management."
 tags: ["traefik", "networking", "github", "rancher", "homelab", "k3s"]
 date: 2023-06-20
-thumbnail: /covers/
+thumbnail: /covers/rancher-traefik.png
 ---
 
 # Using Rancher and Traefik to provide certificates and a management platform to a K3S Cluster

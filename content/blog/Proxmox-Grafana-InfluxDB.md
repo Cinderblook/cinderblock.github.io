@@ -4,7 +4,7 @@ title: "Monitor Proxmox - Grafana - InfluxDB"
 description: "Monitoring resources from Proxmox, using InflucDB, and visualizing with Grafana."
 tags: ["traefik", "networking", "github", "influxdb", "homelab", "grafana"]
 date: 2023-06-28
-thumbnail: /covers/
+thumbnail: /covers/proxmox-influxdb-monitor.png
 ---
 
 # Setup Monitoring for your homelab environment
