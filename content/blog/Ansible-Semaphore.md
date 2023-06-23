@@ -2,14 +2,8 @@
 author: "Austin Barnes"
 title: "Ansible Semaphore - Automating Updates"
 description: "Using Ansible Semaphore, a free and open source UI for managing Ansible within my homelab"
-tags: [
-    "automation",
-    "networking",
-    "github",
-    "ansible",
-    "homelab",
-]
-date: 2023-06-08
+tags: [    "automation", "networking", "github", "ansible", "homelab",]
+date: 2023-05-24
 thumbnail: /covers/Ansible-Semaphore.png
 ---
 # Overview
@@ -121,7 +115,8 @@ Before you can start deploying Ansible tasks with Semaphore, there are a few nec
    - Create three keys:
      - Key titled 'None' with Type 'None'. This will be used for GitHub repository access (since it's public).
      - Key titled 'SSH-Key' with Type 'SSH Key'. This will be used for Ansible to run without sudo.
-     - Key titled 'SSH-Pass' with Type 'Login with password'. This will be used for sudo-required Ansible tasks.
+     - Key titled 'SSH-Pass' with Type 'Login with password'. This will be used for non-sudo SSH Ansible tasks.
+     - Key titled 'SSH-Pass-Sudo' with Type 'Login with Password'. This will be used for sudo-required Ansible SSH tasks.
 
 ![semaphore-01](/examples/ansible-semaphore-01.png 'semaphore-01')
 

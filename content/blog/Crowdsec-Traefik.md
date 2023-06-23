@@ -3,7 +3,7 @@ author: "Austin Barnes"
 title: "Crowdsec & Traefik: Automating Security in Your Homelab"
 description: "Exploring how to utilize Crowdsec with Traefik for enhanced home network security."
 tags: ["traefik", "networking", "github", "crowdsec", "homelab"]
-date: 2023-06-20
+date: 2023-06-09
 thumbnail: /covers/Crowdsec-traefik.png
 ---
 
