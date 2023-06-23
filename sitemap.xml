@@ -5,19 +5,22 @@
     <loc>https://www.cinderblock.tech/blog/</loc>
     <lastmod>2023-06-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://www.cinderblock.tech/tags/crowdsec/</loc>
-    <lastmod>2023-06-20T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.cinderblock.tech/blog/crowdsec-traefik/</loc>
-    <lastmod>2023-06-20T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://www.cinderblock.tech/tags/github/</loc>
     <lastmod>2023-06-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.cinderblock.tech/tags/homelab/</loc>
     <lastmod>2023-06-20T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://www.cinderblock.tech/tags/k3s/</loc>
+    <lastmod>2023-06-20T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://www.cinderblock.tech/tags/networking/</loc>
+    <lastmod>2023-06-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.cinderblock.tech/tags/rancher/</loc>
+    <lastmod>2023-06-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.cinderblock.tech/blog/rancher-traefik/</loc>
     <lastmod>2023-06-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.cinderblock.tech/tags/</loc>
@@ -26,14 +29,20 @@
     <loc>https://www.cinderblock.tech/tags/traefik/</loc>
     <lastmod>2023-06-20T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://www.cinderblock.tech/tags/crowdsec/</loc>
+    <lastmod>2023-06-09T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://www.cinderblock.tech/blog/crowdsec-traefik/</loc>
+    <lastmod>2023-06-09T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://www.cinderblock.tech/tags/ansible/</loc>
-    <lastmod>2023-06-08T00:00:00+00:00</lastmod>
+    <lastmod>2023-05-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.cinderblock.tech/blog/ansible-semaphore/</loc>
-    <lastmod>2023-06-08T00:00:00+00:00</lastmod>
+    <lastmod>2023-05-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.cinderblock.tech/tags/automation/</loc>
-    <lastmod>2023-06-08T00:00:00+00:00</lastmod>
+    <lastmod>2023-05-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.cinderblock.tech/tags/documentation/</loc>
     <lastmod>2023-05-01T00:00:00+00:00</lastmod>
@@ -125,13 +134,7 @@
     <loc>https://www.cinderblock.tech/page/sites/</loc>
     <lastmod>2022-03-30T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://www.cinderblock.tech/tags/k3s/</loc>
-    <lastmod>2022-03-06T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://www.cinderblock.tech/blog/k3s-highly-available-rancher/</loc>
-    <lastmod>2022-03-06T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://www.cinderblock.tech/tags/rancher/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://www.cinderblock.tech/blog/terraform-azure-serv-deploy/</loc>

@@ -6,7 +6,17 @@
     <description>Recent content in k3s on Austin Barnes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/tags/k3s/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 20 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/tags/k3s/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Rancher behind Traefik - K3S</title>
+      <link>https://www.cinderblock.tech/blog/rancher-traefik/</link>
+      <pubDate>Tue, 20 Jun 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/rancher-traefik/</guid>
+      <description>Using Rancher and Traefik to provide certificates and a management platform to a K3S Cluster In this guide, we will be creating an environment consisting of Rancher, Traefik, MySQL, and a K3S cluster. By setting it up this way, we can automate certificate management through Cloudflare (For more details about Cloudflare certificates behind Traefik, refer to other posts, as this won&amp;rsquo;t be covered here.)
+Prerequisites To get started, you&amp;rsquo;ll need:</description>
+    </item>
+    
     <item>
       <title>K3S - Highly-Available-Rancher</title>
       <link>https://www.cinderblock.tech/blog/k3s-highly-available-rancher/</link>

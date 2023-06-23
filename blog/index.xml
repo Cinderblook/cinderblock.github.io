@@ -8,9 +8,19 @@
     <language>en-us</language>
     <lastBuildDate>Tue, 20 Jun 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/blog/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Rancher behind Traefik - K3S</title>
+      <link>https://www.cinderblock.tech/blog/rancher-traefik/</link>
+      <pubDate>Tue, 20 Jun 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.cinderblock.tech/blog/rancher-traefik/</guid>
+      <description>Using Rancher and Traefik to provide certificates and a management platform to a K3S Cluster In this guide, we will be creating an environment consisting of Rancher, Traefik, MySQL, and a K3S cluster. By setting it up this way, we can automate certificate management through Cloudflare (For more details about Cloudflare certificates behind Traefik, refer to other posts, as this won&amp;rsquo;t be covered here.)
+Prerequisites To get started, you&amp;rsquo;ll need:</description>
+    </item>
+    
+    <item>
       <title>Crowdsec &amp; Traefik: Automating Security in Your Homelab</title>
       <link>https://www.cinderblock.tech/blog/crowdsec-traefik/</link>
-      <pubDate>Tue, 20 Jun 2023 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 09 Jun 2023 00:00:00 +0000</pubDate>
       
       <guid>https://www.cinderblock.tech/blog/crowdsec-traefik/</guid>
       <description>Crowdsec &amp;amp; Traefik: Automating Security in Your Homelab Hello there! Today, I&amp;rsquo;m thrilled to introduce you to Crowdsec, an open-source Security threat intelligence project that&amp;rsquo;s perfect for boosting security in your homelab.
@@ -21,7 +31,7 @@ Prior experience with networking and a good understanding of network protocols. 
     <item>
       <title>Ansible Semaphore - Automating Updates</title>
       <link>https://www.cinderblock.tech/blog/ansible-semaphore/</link>
-      <pubDate>Thu, 08 Jun 2023 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 24 May 2023 00:00:00 +0000</pubDate>
       
       <guid>https://www.cinderblock.tech/blog/ansible-semaphore/</guid>
       <description>Overview In this blog post, I&amp;rsquo;d like to introduce you to Semaphore, an open-source Ansible management project. With Semaphore, you can automate and keep track of all your Ansible tasks in your homelab. Check out my current Ansible Playbooks in this GitHub repository.
