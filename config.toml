@@ -25,7 +25,7 @@ favicon = "images/favicon-32x32.png"
 
   [params.footer]
   since = 2_021
-  customText = "Enthusiastic guy who enjoys the outdoors, flying drones, homelabbing, and of course, all things tech."
+  customText = "Enthusiastic guy who enjoys the outdoors, flying drones, homelabbing, and of course, all things tech!"
 
   [params.dateFormat]
   published = "Jan 02, 2006"
