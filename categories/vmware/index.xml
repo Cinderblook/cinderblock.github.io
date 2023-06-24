@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMware on Cinderblock</title><link>https://cinderblock.github.io/categories/vmware/</link><description>Recent content in VMware on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 14 Feb 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted -->
+To complete this project, 3 steps are taken.&lt;/p>
+&lt;ol>
+&lt;li>Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt&lt;/li>
+&lt;li>Use Terraform to deploy 4 virtual machines into a vSphere environment&lt;/li>
+&lt;li>Use Ansible to configure these 4 virtual machines as desired&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/vSphere/vSphere-WinServ-Deployment" target="_blank" rel="noopener"
+>GitHub (vSphere-WinServ-Deployment)&lt;/a> at the repository!&lt;/strong>&lt;/p>
+&lt;h2 id="1-packers-role">1. Packer&amp;rsquo;s Role:&lt;/h2>
+&lt;p>Create a Windows Server 2022 .iso that is updated and has VMTools installed by default using &lt;a class="link" href="https://www.packer.io/" target="_blank" rel="noopener"
+>Packer&lt;/a>. In this solution, it will be geared to usage with vSphere, a VMware product.&lt;/p>
+&lt;p>&lt;strong>First: Packer uses &lt;code>autounattend.xml&lt;/code> and &lt;code>sysprep-autounattend.xml&lt;/code> to automate Windows Settings&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>It pulls Windows Server 2022 Datacenter Eval Edition (Desktop Experience) from Microsoft&amp;rsquo;s site&lt;/li>
+&lt;li>Installs &amp;amp; configure OpenSSH Client &amp;amp; Server for remote connection&lt;/li>
+&lt;li>Installs VMware tools from ISO provided from the build ESX server&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Packer Provisioner Steps&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Updating OS via Windows Update&lt;/li>
+&lt;li>Doing some OS adjustments
+&lt;ul>
+&lt;li>Set Windows telemetry settings to minimum&lt;/li>
+&lt;li>Show file extentions by default&lt;/li>
+&lt;li>Install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+>Chocolatey&lt;/a> - a Windows package manager
+&lt;ul>
+&lt;li>Install Microsoft Edge (Chromium)&lt;/li>
+&lt;li>Install Win32-OpenSSH-Server&lt;/li>
+&lt;li>Install PowerShell Core&lt;/li>
+&lt;li>Install 7-Zip&lt;/li>
+&lt;li>Install Notepad++&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Enable Powershell-Core (&lt;code>pwsh&lt;/code>) to be the default SSHD shell&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Cleanup tasks&lt;/li>
+&lt;li>Remove CDROM drives from VM template (otherwise there would be 2)&lt;/li>
+&lt;/ul>
+&lt;h2 id="2-terraforms-role">2. Terraform&amp;rsquo;s Role:&lt;/h2>
+&lt;p>Main role: Deploy the Virtual Machines&lt;/p>
+&lt;ul>
+&lt;li>Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare)
+&lt;ul>
+&lt;li>Using the vSphere provider:
+&lt;ul>
+&lt;li>Assign appropriate resources to each machine&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Once prepared with appropriate values and the networking is in place:
+&lt;ul>
+&lt;li>Navigate to the Terraform directory and run these commands&lt;/li>
+&lt;li>&lt;code>terraform init&lt;/code> Pull proper Terraform providers and modules used&lt;/li>
+&lt;li>&lt;code>terraform validate&lt;/code> This will return whether the configuration is valid or not&lt;/li>
+&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code> Actually apply the configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="terraform-variable-files">Terraform Variable files&lt;/h2>
+&lt;ul>
+&lt;li>&lt;em>variables.tf&lt;/em>
+&lt;ul>
+&lt;li>Declare variables that will be used with the Terraform configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>terraform.tfvars&lt;/em>
+&lt;ul>
+&lt;li>Assign variables that will be used with the Terraform configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="3-ansibles-role">3. Ansible&amp;rsquo;s Role:&lt;/h2>
+&lt;p>Main role: Configure the deployed Virtual Machines.&lt;/p>
+&lt;ul>
+&lt;li>Setup Windows Server Feature: Domain
+&lt;ul>
+&lt;li>Primary Domain Controller&lt;/li>
+&lt;li>Replica Domain Controller&lt;/li>
+&lt;li>Auto-Join the Virutal Machines to the respective Domain created&lt;/li>
+&lt;li>Create a few users and groups within Active Directory&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup Windows Ssrver Feature: DHCP
+&lt;ul>
+&lt;li>Setup DHCP Scope&lt;/li>
+&lt;li>Authorize it to the Domain.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup Windows Server Feature: File Sharing
+&lt;ul>
+&lt;li>Create two shares
+&lt;ul>
+&lt;li>An employee share and administrator share. These shares are assigned group permissions.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Common Configurations
+&lt;ul>
+&lt;li>Enable RDP and allow it through the firewall on all windows servers created&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ansible-variable-files">Ansible Variable files&lt;/h2>
+&lt;ul>
+&lt;li>&lt;em>inventory.yml&lt;/em>
+&lt;ul>
+&lt;li>Modify hosts associated with the playbook. Assign the IP addressing.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>winlab.yml&lt;/em>
+&lt;ul>
+&lt;li>Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li>
+&lt;li>These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>ansible.cfg&lt;/em>
+&lt;ul>
+&lt;li>Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>./group_vars/all.yml&lt;/em>
+&lt;ul>
+&lt;li>Contains specific variable information used within the ./roles/* Ansible code.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="prerequisites">Prerequisites&lt;/h1>
+&lt;ul>
+&lt;li>Linux machine with the following
+&lt;ul>
+&lt;li>Ansible
+&lt;ul>
+&lt;li>&lt;code>sudo apt update&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt install software-properties-common&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo add-apt-repository --yes --update ppa:ansible/ansible&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt install ansible&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Terraform
+&lt;ul>
+&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install -y gnupg software-properties-common curl&lt;/code>&lt;/li>
+&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install terraform&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Packer
+&lt;ul>
+&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install packer&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Git
+&lt;ul>
+&lt;li>&lt;code>sudo apt-get install git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>A Code Interprester
+&lt;ul>
+&lt;li>I recommend &lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
+>Visual-Studio-Code&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>vSphere Lab Environment
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.vmware.com/products/vsphere.html" target="_blank" rel="noopener"
+>vSphere&lt;/a> &amp;mdash; &lt;em>Note: This project is using vSphere version 7.0.0&lt;/em>
+&lt;!-- raw HTML omitted -->&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="packer">Packer&lt;/h1>
+&lt;h2 id="navigate-to-packer-directory">Navigate to Packer Directory&lt;/h2>
+&lt;ul>
+&lt;li>First setup Packer environment
+&lt;ul>
+&lt;li>&lt;code>packer init -upgrade ws2022.pkr.hcl&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Then apply the Packer configuration to create the Windows Server 2022 Image
+&lt;ul>
+&lt;li>&lt;code>packer build -timestamp-ui -force -var-file=myvarfile.json ws2022.pkr.hcl&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;ul>
+&lt;li>This packer execute pulls the newest windows server datacenter 2022 eval .iso from microsoft populates it into the vSphere environment, in the specified datacenter/cluster/host/datastore&lt;/li>
+&lt;li>It then runs commands to: Grab DHCP, Updates the image, Enables SSH, Enables RDP, Configures necessary firewall settings, sets passwords/usernames, &amp;amp; installs VMware Tools to base image&lt;/li>
+&lt;li>Additionally, it will install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+>Chocolatey&lt;/a> for packages, notepad++, Edge, &amp;amp; 7-zip
+&lt;!-- raw HTML omitted -->&lt;/li>
+&lt;/ul>
+&lt;h2 id="after-packer-finishes">After Packer Finishes&lt;/h2>
+&lt;h6 id="roughly-an-hour-depending-on-processing-and-internet-speed">&lt;em>Roughly an hour depending on processing and internet speed&lt;/em>&lt;/h6>
+&lt;ul>
+&lt;li>Go into your vSphere and turn the resulting VM into a Template
+&lt;ul>
+&lt;li>Ensure this mimics the variables you have set in the terraform.tfvars file. This will be our next step.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="terraform">Terraform&lt;/h1>
+&lt;h2 id="navigate-to-terraform-directory">Navigate to Terraform Directory&lt;/h2>
+&lt;ul>
+&lt;li>Setup Terraform Environemnt
+&lt;ul>
+&lt;li>&lt;code>terraform init&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Format terraform to ensure it meets criteria required
+&lt;ul>
+&lt;li>&lt;code>terraform fmt&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Do a terraform plan to detect any potential errors in code and to see potential end result. Read over this
+&lt;ul>
+&lt;li>&lt;code>terraform plan&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Finally, if all the above appears correct, perform a terraform apply
+&lt;ul>
+&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code>
+&lt;ul>
+&lt;li>This may take awhile, once it is done, double check in vSphere all necessary Virtual Machines were created properly &lt;em>(For me this took 20 minutes to fully complete)&lt;/em>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="ansible">Ansible&lt;/h1>
+&lt;h2 id="navigate-to-ansible-directory">Navigate to Ansible Directory&lt;/h2>
+&lt;ul>
+&lt;li>Once you have allowed Terraform to finish its configuraiton:
+&lt;ul>
+&lt;li>Navigate to your Ansible Directory, &lt;code>cd &amp;lt;path-to-Ansible&amp;gt;&lt;/code>&lt;/li>
+&lt;li>Run your ansible playbook &lt;code>ansible-playbook winlab.yml&lt;/code>
+&lt;ul>
+&lt;li>This should run through and detail each change as it plays out&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="references-useduseful-links">References Used/Useful Links&lt;/h1>
+&lt;h3 id="i-sourced-various-code-and-peices-of-information-from-the-following-git-repositories">I sourced various code and peices of information from the following Git Repositories&lt;/h3>
+&lt;ul>
+&lt;li>Stefan Zimmermann &lt;a class="link" href="https://gitlab.com/StefanZ8n/packer-ws2022" target="_blank" rel="noopener"
+>GitLab&lt;/a> &lt;a class="link" href="https://z8n.eu/2021/11/09/building-a-windows-server-2022-ova-with-packer/" target="_blank" rel="noopener"
+>Article&lt;/a>&lt;/li>
+&lt;li>Dmitry Teslya &lt;a class="link" href="https://github.com/dteslya/win-iac-lab" target="_blank" rel="noopener"
+>GitHub&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="useful-places-for-refernece">Useful places for refernece&lt;/h3>
+&lt;ul>
+&lt;li>Tutorials for Terraform, Packer, and others &lt;a class="link" href="https://learn.hashicorp.com/search?query=Packer" target="_blank" rel="noopener"
+>Hashicorp-Tutorials&lt;/a>&lt;/li>
+&lt;li>Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
+>Documentation&lt;/a>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
+>Windows-Modules&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
+>Documentation&lt;/a>&lt;/li>
+&lt;li>Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
+>Documentation&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

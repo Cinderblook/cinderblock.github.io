@@ -1,33 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>website on Austin Barnes</title>
-    <link>https://www.cinderblock.tech/tags/website/</link>
-    <description>Recent content in website on Austin Barnes</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Mon, 01 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://www.cinderblock.tech/tags/website/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>TackleBox - GitHub Mega Repo</title>
-      <link>https://www.cinderblock.tech/blog/github-tacklebox/</link>
-      <pubDate>Mon, 01 May 2023 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.cinderblock.tech/blog/github-tacklebox/</guid>
-      <description>Overview Welcome to the TackleBox, my repository that houses a diverse collection of projects and scripts.
-Check out all the goodies in this repo on GitHub.
-A Quick Peek Greetings, fellow tech enthusiasts! I thought it would be a great idea to showcase the mishmash of projects and scripts I&amp;rsquo;ve accumulated in this repository of mine, aptly named the TackleBox. Within this repository, you&amp;rsquo;ll find a wide range of content, from network automation scripts using PowerShell and Ansible to infrastructure-as-code solutions with Packer and Terraform.</description>
-    </item>
-    
-    <item>
-      <title>Hugo GitPage - Creating a free website</title>
-      <link>https://www.cinderblock.tech/blog/hugo-github-page/</link>
-      <pubDate>Sat, 08 Oct 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.cinderblock.tech/blog/hugo-github-page/</guid>
-      <description>Overview Using Github pages, Github actions, and Hugo to create a static website for free.
-Check out all of the configuration files on GitHub at the repository.
-Prerequisites Have a Domain name purchased (Will be demonstrating CloudFlare in this guide) Have a GitHub Account Steps Create a Public Repository Change Repository settings Custom Domain Name (Optional) Setup Hugo Picking a Theme Commit Create a Public Repository Go ahead and create a new repository.</description>
-    </item>
-    
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>website on Cinderblock</title><link>https://cinderblock.github.io/tags/website/</link><description>Recent content in website on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 01 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/website/index.xml" rel="self" type="application/rss+xml"/><item><title>TackleBox - GitHub Mega Repo</title><link>https://cinderblock.github.io/p/tacklebox-github-mega-repo/</link><pubDate>Mon, 01 May 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/tacklebox-github-mega-repo/</guid><description>&lt;img src="https://cinderblock.github.io/p/tacklebox-github-mega-repo/TackleboxGitHub.png" alt="Featured image of post TackleBox - GitHub Mega Repo" />&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>Welcome to the TackleBox, my repository that houses a diverse collection of projects and scripts.&lt;/p>
+&lt;p>&lt;strong>Check out all the goodies in this repo on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox" target="_blank" rel="noopener"
+>GitHub&lt;/a>.&lt;/strong>&lt;/p>
+&lt;h2 id="a-quick-peek">A Quick Peek&lt;/h2>
+&lt;p>Greetings, fellow tech enthusiasts! I thought it would be a great idea to showcase the mishmash of projects and scripts I&amp;rsquo;ve accumulated in this repository of mine, aptly named the TackleBox. Within this repository, you&amp;rsquo;ll find a wide range of content, from network automation scripts using PowerShell and Ansible to infrastructure-as-code solutions with Packer and Terraform. I also explore various mini-projects involving Docker containers and dabble in the world of Kubernetes.&lt;/p>
+&lt;p>As someone who constantly seeks ways to streamline my workflow and simplify my life, I realized that the best approach would be to create a well-organized repository containing thorough documentation and useful scripts that I create along the way.&lt;/p>
+&lt;p>So please, take a look around, and you might discover something valuable: &lt;a class="link" href="https://github.com/Cinderblook/tacklebox" target="_blank" rel="noopener"
+>TackleBox - GitHub&lt;/a>&lt;/p></description></item></channel></rss>

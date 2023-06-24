@@ -1,0 +1,1740 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Packer on Cinderblock</title><link>https://cinderblock.github.io/categories/packer/</link><description>Recent content in Packer on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 30 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/packer/index.xml" rel="self" type="application/rss+xml"/><item><title>Packer - Proxmox Ubuntu Server Creation</title><link>https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/</link><pubDate>Sat, 30 Jul 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/</guid><description>&lt;img src="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker.png" alt="Featured image of post Packer - Proxmox Ubuntu Server Creation" />&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>Using Packer to create a Ubunut 22.04 server image within Proxmox. This is designed with Proxmox Virtual Environment version 7.1 in mind.&lt;/p>
+&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Packer/Proxmox/packer-iso-ubuntu" target="_blank" rel="noopener"
+>GitHub&lt;/a> at the repository.&lt;/strong>&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;ol>
+&lt;li>Must have &lt;a class="link" href="https://learn.hashicorp.com/tutorials/packer/get-started-install-cli" target="_blank" rel="noopener"
+>Packer&lt;/a> configured on your machine, DHCP running on the network, and a Proxmox server available (Preferrable to be version 7.1)&lt;/li>
+&lt;li>Have a Proxmox user created with proper privledges for Terraform (&lt;a class="link" href="https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/" target="_blank" rel="noopener"
+>See how to create the user here&lt;/a>)&lt;/li>
+&lt;li>Ubuntu Server 22.04 Iso uploaded to your Proxmox server&lt;/li>
+&lt;/ol>
+&lt;h2 id="getting-proper-files-setup">Getting proper files setup&lt;/h2>
+&lt;p>There are two primary files that will need configured.&lt;/p>
+&lt;p>The first of the two is our credentials.pkr.hcl file. Update all variables within to your own. Any more in-depth configuration can be done within the ubuntu-server-focal.pkr.hcl file.&lt;/p>
+&lt;p>You can generate your token-id and token secret using the following command into your Proxmox Shell &lt;code>pveum user token add terraform-prov@pve terraform-token --privsep=0&lt;/code> Replace terraform-prov@pve with your created username &lt;strong>Write this down because you won&amp;rsquo;t be able to find this access token again later&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1.png"
+width="760"
+height="168"
+srcset="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1_hu611b113527e9bc21bba385ea7e244286_11142_480x0_resize_box_3.png 480w, https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1_hu611b113527e9bc21bba385ea7e244286_11142_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Proxmox-Token-Generate"
+class="gallery-image"
+data-flex-grow="452"
+data-flex-basis="1085px"
+>&lt;/p>
+&lt;p>An Example credneitals/pkr.hcl file&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_api_url&lt;/span> = &lt;span class="s2">&amp;#34;https://yourProxmox.server:8006/api2/json&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_api_token_id&lt;/span> = &lt;span class="s2">&amp;#34;full-tokenid&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_api_token_secret&lt;/span> = &lt;span class="s2">&amp;#34;tokenValue&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_node&lt;/span> = &lt;span class="s2">&amp;#34;nodeToBuildOn&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_storage_pool&lt;/span> = &lt;span class="s2">&amp;#34;storagePoolToBuildOn&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_storage_pool_type&lt;/span> = &lt;span class="s2">&amp;#34;typeOf-pm_storage_pool&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ssh_username&lt;/span> = &lt;span class="s2">&amp;#34;yourSshUser&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ssh_password&lt;/span> = &lt;span class="s2">&amp;#34;yourSshPassword&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ssh_private_key_file&lt;/span> = &lt;span class="s2">&amp;#34;~/.ssh/id_rsa&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">vm_name&lt;/span> = &lt;span class="s2">&amp;#34;vm name&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">vm_id&lt;/span> = &lt;span class="s2">&amp;#34;1003&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">iso_file&lt;/span> = &lt;span class="s2">&amp;#34;local:iso/ubuntu-22.04-live-server-amd64.iso&amp;#34;&lt;/span>&lt;span class="c1"> #Iso file location on your proxmox
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Second file to update to your preference is our user-data.example file. You only need to update the fields beneath user-data, users + passwd, and potentially your timezone.&lt;/p>
+&lt;p>&lt;em>&lt;strong>The passwd fields in cloud-init files must be in a sha-512 hash. Generate a hash using &lt;code>echo passwd | mkpasswd -m sha-512 -s &lt;/code>&lt;/strong>&lt;/em>&lt;/p>
+&lt;p>An Example user-data file&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c">#cloud-config&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">autoinstall&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">locale&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">en_US&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">keyboard&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">layout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">en&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ssh&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">install-server&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">allow-pw&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">disable_root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ssh_quiet_keygen&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">allow_public_ssh_keys&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">packages&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">qemu-guest-agent&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">sudo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">storage&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">layout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">direct&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">swap&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">size&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">user-data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">package_upgrade&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">timezone&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">America/New_York&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">users&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">username-here&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">groups&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">adm, sudo]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">lock-passwd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">sudo&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ALL=(ALL) NOPASSWD:ALL&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">shell&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/bin/bash&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># passwd: your-password&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># - or -&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># ssh_authorized_keys:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># - your-ssh-key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="finally-the-packer-process">Finally, the Packer Process&lt;/h2>
+&lt;p>First thing we should do prior to going further, is double check the valiation of our Packer files. Otherwise we could have some major headache.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>cd into the project directory (./ubuntu-server-focal), and run &lt;code>packer validate -var-file='..\credentials.pkr.hcl' .\ubuntu-server-focal.pkr.hcl&lt;/code>&lt;/p>
+&lt;ul>
+&lt;li>If any errors show up, you&amp;rsquo;ll have to fix them before moving on&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>Once we have confirmed everything appears correct, we can run the build, cross our fingers, and it should work.&lt;/p>
+&lt;ol start="2">
+&lt;li>Build the image (Within the same project directory where you ran the validate), &lt;code>packer build -var-file='..\credentials.pkr.hcl' .\ubuntu-server-focal.pkr.hcl&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h2 id="useful-resources">Useful Resources&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" target="_blank" rel="noopener"
+>Terraform Provider for Proxmox&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" target="_blank" rel="noopener"
+>Proxmmox User Creation Guide&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://learn.hashicorp.com/packer" target="_blank" rel="noopener"
+>Packer Tutoritals&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Terraform - Azure Server Deploy</title><link>https://cinderblock.github.io/p/terraform-azure-server-deploy/</link><pubDate>Mon, 28 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-azure-server-deploy/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-azure-server-deploy/Azure&Terraform.png" alt="Featured image of post Terraform - Azure Server Deploy" />&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>Deploy and Configure 4 Windows 2022 Datacenter Servers in Azure.&lt;/p>
+&lt;ul>
+&lt;li>Using Terraform in conjunction with Ansible and cloudinit: Create 4 Windows Servers
+&lt;ul>
+&lt;li>Configure them to be a Primary Domain Controller, Replica Domain Controller, DHCP server, and Fileshare server&lt;/li>
+&lt;li>Automate intial setup of the 4 servers to accept Ansible configuration from a Linux VM in Azure created VIA the Terraform deployment&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/Azure/Azure-Serv-Deploy" target="_blank" rel="noopener"
+>GitHub (Azure-Serv-Deploy)&lt;/a> at the repository!&lt;/strong>&lt;/p>
+&lt;h1 id="terraform">Terraform&lt;/h1>
+&lt;p>Main role: Deploy the Virtual Machines, setup Network environment, and provide intial parameters for both Windows and Linux environments running in the cloud&lt;/p>
+&lt;ul>
+&lt;li>Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare) in Azure
+&lt;ul>
+&lt;li>These will all be Windows 2022 Datacenter Servers running on Standard_DS1_V2 by default&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup the one Linux server to deploy a pre-defined Ansible configuration across the Windows Environment for setting up Active Directory, DHCP, File shares, users, and groups.
+&lt;ul>
+&lt;li>This will all be an Ubuntu 18.04-LTS server running on Standard_B1s by default&lt;/li>
+&lt;li>It will use cloud-init to supply it the necessary setup at creation for Ansible and SSH connection VIA its public IP address.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Supply necessary networking variables (Network interfaces, Security Groups, IP Addressing)&lt;/li>
+&lt;li>Supply necessary files for automation of Windows &amp;amp; Linux environments (Cloud-Init &amp;amp; Windows Unattend files)&lt;/li>
+&lt;/ul>
+&lt;!-- raw HTML omitted -->
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;ul>
+&lt;li>Setup necessary Terraform &lt;a class="link" href="https://learn.hashicorp.com/tutorials/terraform/install-cli" target="_blank" rel="noopener"
+>environment&lt;/a>&lt;/li>
+&lt;li>Install and setup &lt;a class="link" href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli" target="_blank" rel="noopener"
+>Azure CLI&lt;/a> or preferred method of authentication to Azure&lt;/li>
+&lt;li>Configure variables for desired outcomes (Outlined further down)
+&lt;!-- raw HTML omitted -->&lt;/li>
+&lt;/ul>
+&lt;h2 id="terraform-process">Terraform process&lt;/h2>
+&lt;ul>
+&lt;li>Using the Azure provider:
+&lt;ul>
+&lt;li>Login to Azure with &lt;code>az connect&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Once prepared with appropriate values and the networking is in place:
+&lt;ul>
+&lt;li>Navigate to the Terraform directory and run these commands&lt;/li>
+&lt;li>&lt;code>terraform init&lt;/code> Pull proper Terraform providers and modules used&lt;/li>
+&lt;li>&lt;code>terraform validate&lt;/code> This will return whether the configuration is valid or not&lt;/li>
+&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code> Actually apply the configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="terraform-file-structure">Terraform File Structure&lt;/h2>
+&lt;p>Create a new directory, and place the following files in it, with your own variables&lt;/p>
+&lt;h3 id="providertf-file">&lt;em>provider.tf&lt;/em> File&lt;/h3>
+&lt;ul>
+&lt;li>Calls necessary providers and sets their versions to be used in the Terraform configuration/deployment. Informs Terraform which modules and providers to use.&lt;/li>
+&lt;/ul>
+&lt;p>provider.tf&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">terraform&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">required_providers&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">azurerm&lt;/span> = &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source&lt;/span> = &lt;span class="s2">&amp;#34;hashicorp/azurerm&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;&amp;gt;=2.91.0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">provider&lt;/span> &lt;span class="s2">&amp;#34;azurerm&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">features&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="networkingtf-file">&lt;em>networking.tf&lt;/em> File&lt;/h3>
+&lt;ul>
+&lt;li>Defines resources, security groups, security rules, network interfaces, subnets, and public IPs to be created in Azure.
+&lt;ul>
+&lt;li>These variables are pulled from the VM creation resources&lt;/li>
+&lt;li>Managed with variables contained in terraform.tfvars file&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>networking.tf&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;span class="lnt">125
+&lt;/span>&lt;span class="lnt">126
+&lt;/span>&lt;span class="lnt">127
+&lt;/span>&lt;span class="lnt">128
+&lt;/span>&lt;span class="lnt">129
+&lt;/span>&lt;span class="lnt">130
+&lt;/span>&lt;span class="lnt">131
+&lt;/span>&lt;span class="lnt">132
+&lt;/span>&lt;span class="lnt">133
+&lt;/span>&lt;span class="lnt">134
+&lt;/span>&lt;span class="lnt">135
+&lt;/span>&lt;span class="lnt">136
+&lt;/span>&lt;span class="lnt">137
+&lt;/span>&lt;span class="lnt">138
+&lt;/span>&lt;span class="lnt">139
+&lt;/span>&lt;span class="lnt">140
+&lt;/span>&lt;span class="lnt">141
+&lt;/span>&lt;span class="lnt">142
+&lt;/span>&lt;span class="lnt">143
+&lt;/span>&lt;span class="lnt">144
+&lt;/span>&lt;span class="lnt">145
+&lt;/span>&lt;span class="lnt">146
+&lt;/span>&lt;span class="lnt">147
+&lt;/span>&lt;span class="lnt">148
+&lt;/span>&lt;span class="lnt">149
+&lt;/span>&lt;span class="lnt">150
+&lt;/span>&lt;span class="lnt">151
+&lt;/span>&lt;span class="lnt">152
+&lt;/span>&lt;span class="lnt">153
+&lt;/span>&lt;span class="lnt">154
+&lt;/span>&lt;span class="lnt">155
+&lt;/span>&lt;span class="lnt">156
+&lt;/span>&lt;span class="lnt">157
+&lt;/span>&lt;span class="lnt">158
+&lt;/span>&lt;span class="lnt">159
+&lt;/span>&lt;span class="lnt">160
+&lt;/span>&lt;span class="lnt">161
+&lt;/span>&lt;span class="lnt">162
+&lt;/span>&lt;span class="lnt">163
+&lt;/span>&lt;span class="lnt">164
+&lt;/span>&lt;span class="lnt">165
+&lt;/span>&lt;span class="lnt">166
+&lt;/span>&lt;span class="lnt">167
+&lt;/span>&lt;span class="lnt">168
+&lt;/span>&lt;span class="lnt">169
+&lt;/span>&lt;span class="lnt">170
+&lt;/span>&lt;span class="lnt">171
+&lt;/span>&lt;span class="lnt">172
+&lt;/span>&lt;span class="lnt">173
+&lt;/span>&lt;span class="lnt">174
+&lt;/span>&lt;span class="lnt">175
+&lt;/span>&lt;span class="lnt">176
+&lt;/span>&lt;span class="lnt">177
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create a resource group to maintain security settings along with network interfaces for VMs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_resource_group&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;east&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;terra-resources&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="s2">&amp;#34;East US&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ASSIGN ADDRESS SPACE TO RESOURCE GROUP
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_virtual_network&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;east&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;east-network&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">address_space&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east_address_spaces&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ASSIGN SUBNET TO NETWORK ADDRESS SPACE
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_subnet&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;subnet1&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">virtual_network_name&lt;/span> = &lt;span class="nx">azurerm_virtual_network&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">address_prefixes&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east_subnets&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create public IP variable for Linux machine
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_public_ip&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;linux_public&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;PublicIp1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">allocation_method&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create public IP variable for Windows machine
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_public_ip&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;win_public&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;PublicIp2&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">allocation_method&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ASSIGN NETWORK INTERFACE PER VM WE WILL BE USING
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;linux1&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;linux1-nic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ip_configuration&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">subnet_id&lt;/span> = &lt;span class="nx">azurerm_subnet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">subnet1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address_allocation&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux1_priavte_ip&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">public_ip_address_id&lt;/span> = &lt;span class="nx">azurerm_public_ip&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_public&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv1&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;winserv1-nic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ip_configuration&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">subnet_id&lt;/span> = &lt;span class="nx">azurerm_subnet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">subnet1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address_allocation&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv1_private_ip&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">public_ip_address_id&lt;/span> = &lt;span class="nx">azurerm_public_ip&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">win_public&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv2&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;winserv2-nic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ip_configuration&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">subnet_id&lt;/span> = &lt;span class="nx">azurerm_subnet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">subnet1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address_allocation&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv2_private_ip&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv3&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;winserv3-nic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ip_configuration&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">subnet_id&lt;/span> = &lt;span class="nx">azurerm_subnet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">subnet1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address_allocation&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv3_private_ip&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv4&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;winserv4-nic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ip_configuration&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">subnet_id&lt;/span> = &lt;span class="nx">azurerm_subnet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">subnet1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address_allocation&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_ip_address&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv4_private_ip&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># CREATE SECURITY GROUPs TO ALLOW SSH/RDP/ANSIBLE FOR VMs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_security_group&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;linux1&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;Allow-SSH&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">security_rule&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;SSH&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">priority&lt;/span> = &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">direction&lt;/span> = &lt;span class="s2">&amp;#34;Inbound&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">access&lt;/span> = &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">protocol&lt;/span> = &lt;span class="s2">&amp;#34;Tcp&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_port_range&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_port_range&lt;/span> = &lt;span class="s2">&amp;#34;22&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_security_group&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;Allow-RDP-SSH-ANS&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">security_rule&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;RDP&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">priority&lt;/span> = &lt;span class="m">101&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">direction&lt;/span> = &lt;span class="s2">&amp;#34;Inbound&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">access&lt;/span> = &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">protocol&lt;/span> = &lt;span class="s2">&amp;#34;Tcp&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_port_range&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_port_range&lt;/span> = &lt;span class="s2">&amp;#34;3389&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">security_rule&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;SSH&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">priority&lt;/span> = &lt;span class="m">102&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">direction&lt;/span> = &lt;span class="s2">&amp;#34;Inbound&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">access&lt;/span> = &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">protocol&lt;/span> = &lt;span class="s2">&amp;#34;Tcp&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_port_range&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_port_range&lt;/span> = &lt;span class="s2">&amp;#34;22&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">security_rule&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;ANSIBLE&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">priority&lt;/span> = &lt;span class="m">103&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">direction&lt;/span> = &lt;span class="s2">&amp;#34;Inbound&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">access&lt;/span> = &lt;span class="s2">&amp;#34;Allow&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">protocol&lt;/span> = &lt;span class="s2">&amp;#34;Tcp&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_port_range&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_port_range&lt;/span> = &lt;span class="s2">&amp;#34;5985&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east_subnets&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination_address_prefix&lt;/span> = &lt;span class="s2">&amp;#34;*&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ASSIGN SECURITY GROUPS TO INTERFACES
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># LINUX SSH
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface_security_group_association&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;linux1&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_id&lt;/span> = &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_security_group_id&lt;/span> = &lt;span class="nx">azurerm_network_security_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># WINSERV RDP
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface_security_group_association&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv1&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_id&lt;/span> = &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_security_group_id&lt;/span> = &lt;span class="nx">azurerm_network_security_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface_security_group_association&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv2&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_id&lt;/span> = &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_security_group_id&lt;/span> = &lt;span class="nx">azurerm_network_security_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface_security_group_association&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv3&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_id&lt;/span> = &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_security_group_id&lt;/span> = &lt;span class="nx">azurerm_network_security_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_network_interface_security_group_association&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;winserv4&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_id&lt;/span> = &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv4&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_security_group_id&lt;/span> = &lt;span class="nx">azurerm_network_security_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="variablestf-terraformtfvars-files">&lt;em>variables.tf, terraform.tfvars&lt;/em> Files&lt;/h3>
+&lt;ul>
+&lt;li>Alter variables within these files to ensure they meet your environment needs
+&lt;ul>
+&lt;li>&lt;em>variables.tf&lt;/em>
+&lt;ul>
+&lt;li>Declare variables that will be used with the Terraform configuration (Delcared intially or explicitely here as &lt;code>locals&lt;/code> variables)&lt;/li>
+&lt;li>Specific local variables used for Windows .xml files
+&lt;ul>
+&lt;li>&lt;em>firsT_logon_commands&lt;/em> local variable points to a .xml file to configure first time logon in Windows. This enables each server to recieve Winrm data on port 5985 for Ansible configuration&lt;/li>
+&lt;li>*auto_logon_ runs a .xml configuration to log in once right after intial creation of VM. This allows &lt;em>first_logon_commands&lt;/em> to execute automatically&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>variables.tf&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_vm_os_publisher&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_vm_os_offer&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_vm_os_sku&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_vm_size&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winadmin_username&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winadmin_password&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_license&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_sa_type&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_pdc&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_rdc&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_dhcp&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_file&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_server&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_vm_os_publisher&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_vm_os_offer&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_vm_os_sku&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_vm_size&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_ssh_key&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_sa_type&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux_ssh_key_pv&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_allocation_method&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;east_address_spaces&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;east_subnets&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv_public_ip_sku&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv1_private_ip&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv2_private_ip&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv3_private_ip&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;winserv4_private_ip&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;linux1_priavte_ip&amp;#34;&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">locals&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">first_logon_commands&lt;/span> = &lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nb">module&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/ winfiles/FirstLogonCommands.xml&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">auto_logon&lt;/span> = &lt;span class="s2">&amp;#34;&amp;lt;AutoLogon&amp;gt;&amp;lt;Password&amp;gt;&amp;lt;Value&amp;gt;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_password&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;lt;/ Value&amp;gt;&amp;lt;/Password&amp;gt;&amp;lt;Enabled&amp;gt;true&amp;lt;/Enabled&amp;gt;&amp;lt;LogonCount&amp;gt;1&amp;lt;/ LogonCount&amp;gt;&amp;lt;Username&amp;gt;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;lt;/ Username&amp;gt;&amp;lt;/AutoLogon&amp;gt;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;em>terraform.tfvars&lt;/em>
+&lt;ul>
+&lt;li>Assign variables values here. These will be used with the Terraform configuration. If left blank, you can assign the variable at the terminal level when running the &lt;code>terraform apply&lt;/code>
+&lt;ul>
+&lt;li>Alter Network values to desired IP addressing scheme
+&lt;ul>
+&lt;li>&lt;strong>Ensure IP addressing matches that in the Ansible configuration inventory.yml&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Here you can alter azure values for &lt;em>publisher&lt;/em>, &lt;em>offer&lt;/em>, &lt;em>sku&lt;/em>, &lt;em>size&lt;/em>, &lt;em>sa&lt;/em>, and &lt;em>license&lt;/em> information for the Windows/Linux VMs&lt;/li>
+&lt;li>Additionally, ensure &lt;code>linux_ssh_key&lt;/code> point to your public Key &lt;code>id_rsa.pubc&lt;/code> file&lt;/li>
+&lt;li>I recommend to change &lt;em>winadmin_username&lt;/em> &amp;amp; &lt;em>winadmin_password&lt;/em> variables to sensetive and blank so you can delcare them in preferrably Vaulty or via the CLI
+&lt;ul>
+&lt;li>&lt;strong>&lt;em>winadmin_username&lt;/em> &amp;amp; &lt;em>winadmin_password&lt;/em> MUST MATCH WHAT IS IN ANSIBLE /group_vars/all.yml&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>terraform.tfvars&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Azure Windows Server related params
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="na">winserv_vm_os_publisher&lt;/span> =&lt;span class="s2">&amp;#34;MicrosoftWindowsServer&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_vm_os_offer&lt;/span> = &lt;span class="s2">&amp;#34;WindowsServer&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_vm_os_sku&lt;/span> = &lt;span class="s2">&amp;#34;2022-Datacenter&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_vm_size&lt;/span> = &lt;span class="s2">&amp;#34;Standard_DS1_V2&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_license&lt;/span> = &lt;span class="s2">&amp;#34;Windows_Server&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_allocation_method&lt;/span> = &lt;span class="s2">&amp;#34;Static&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_public_ip_sku&lt;/span> = &lt;span class="s2">&amp;#34;Standard&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_sa_type&lt;/span> = &lt;span class="s2">&amp;#34;Standard_LRS&amp;#34;&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Azure Linux Server related params
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="na">linux_vm_os_publisher&lt;/span> = &lt;span class="s2">&amp;#34;Canonical&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_vm_os_offer&lt;/span> = &lt;span class="s2">&amp;#34;UbuntuServer&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_vm_os_sku&lt;/span> = &lt;span class="s2">&amp;#34;18.04-LTS&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_vm_size&lt;/span> = &lt;span class="s2">&amp;#34;Standard_B1s&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_ssh_key&lt;/span> =&lt;span class="s2">&amp;#34;Local-PUBLIC-SSH-KEY-Here&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_sa_type&lt;/span> = &lt;span class="s2">&amp;#34;Premium_LRS&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_ssh_key_pv&lt;/span> = &lt;span class="s2">&amp;#34;Local-PRIV-SSH-KEY-Here&amp;#34;&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Which Windows administrator password to setduring vm customization
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="na">winadmin_username&lt;/span> = &lt;span class="s2">&amp;#34;SuperAdministrator&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winadmin_password&lt;/span> = &lt;span class="s2">&amp;#34;Password1234&amp;#34;&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Naming Schemes
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="na">winserv_pdc&lt;/span> = &lt;span class="s2">&amp;#34;ajb-pdc&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_rdc&lt;/span> = &lt;span class="s2">&amp;#34;ajb-rdc&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_dhcp&lt;/span> = &lt;span class="s2">&amp;#34;ajb-dhcp&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv_file&lt;/span> = &lt;span class="s2">&amp;#34;ajb-file&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux_server&lt;/span> = &lt;span class="s2">&amp;#34;ajb-operator&amp;#34;&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Networking Variables
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="na">winserv1_private_ip&lt;/span> = &lt;span class="s2">&amp;#34;10.0.1.10&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv2_private_ip&lt;/span> = &lt;span class="s2">&amp;#34;10.0.1.11&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv3_private_ip&lt;/span> = &lt;span class="s2">&amp;#34;10.0.1.12&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">winserv4_private_ip&lt;/span> = &lt;span class="s2">&amp;#34;10.0.1.13&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">linux1_priavte_ip&lt;/span> = &lt;span class="s2">&amp;#34;10.0.1.9&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">east_address_spaces&lt;/span> = &lt;span class="s2">&amp;#34;10.0.0.0/16&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">east_subnets&lt;/span> = &lt;span class="s2">&amp;#34;10.0.1.0/24&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="01-linuxclienttf--02-winserverstf-files">&lt;em>01-LinuxClient.tf&lt;/em> &amp;amp; &lt;em>02-WinServers.tf&lt;/em> Files&lt;/h3>
+&lt;ul>
+&lt;li>Here the creation of the VMs occur. Resources pull data from &lt;em>networking.tf&lt;/em>, &lt;em>variables.tf&lt;/em>, &lt;em>terraform.tfvars&lt;/em> files.
+&lt;ul>
+&lt;li>Windows VMs are assigned unattend configurations for first time setup (/winfiles/FirstLogonCommands.xml &amp;amp;&amp;amp; &lt;em>auto_logon&lt;/em> variable data)&lt;/li>
+&lt;li>Linux Machine is assigned a cloud-init file configuraiton for first time setup (/cloudinit/custom.yml) We will create this in the next step.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>01-LinuxClient.tf&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;span class="lnt">67
+&lt;/span>&lt;span class="lnt">68
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># This pulls a Ubuntu Datacenter from Microsoft&amp;#39;s VM platform directly
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_linux_virtual_machine&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;operator&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_server&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">size&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_vm_size&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_username&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_ids&lt;/span> = &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">admin_ssh_key&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">username&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">public_key&lt;/span> = &lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_ssh_key&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # Cloud-Init passed here
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="na">custom_data&lt;/span> = &lt;span class="nb">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">template_cloudinit_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">rendered&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os_disk&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">caching&lt;/span> = &lt;span class="s2">&amp;#34;ReadWrite&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">storage_account_type&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_sa_type&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">source_image_reference&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">publisher&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_vm_os_publisher&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">offer&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_vm_os_offer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sku&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_vm_os_sku&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;latest&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create cloud-init file to be passed into linux vm
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">data&lt;/span> &lt;span class="s2">&amp;#34;template_file&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;user_data&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">template&lt;/span> = &lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;./cloudinit/custom.yml&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Render a multi-part cloud-init config making use of the part
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># above, and other source files
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">data&lt;/span> &lt;span class="s2">&amp;#34;template_cloudinit_config&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;config&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">gzip&lt;/span> = &lt;span class="kc">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">base64_encode&lt;/span> = &lt;span class="kc">true&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # Main cloud-config configuration file.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">part&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">filename&lt;/span> = &lt;span class="s2">&amp;#34;init.cfg&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content_type&lt;/span> = &lt;span class="s2">&amp;#34;text/cloud-config&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">template_file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">user_data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">rendered&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # Pass Ansible File into created Linux VM using SCP (SSH Port 22)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;null_resource&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;copyansible&amp;#34;&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connection&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">type&lt;/span> = &lt;span class="s2">&amp;#34;ssh&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">host&lt;/span> = &lt;span class="nx">azurerm_public_ip&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_public&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ip_address&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">user&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">private_key&lt;/span> = &lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_ssh_key_pv&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr"> provisioner&lt;/span> &lt;span class="s2">&amp;#34;file&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nb">module&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/Ansible&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">destination&lt;/span> = &lt;span class="s2">&amp;#34;/tmp/&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_linux_virtual_machine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">operator&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>02-WinServers.tf&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;span class="lnt">125
+&lt;/span>&lt;span class="lnt">126
+&lt;/span>&lt;span class="lnt">127
+&lt;/span>&lt;span class="lnt">128
+&lt;/span>&lt;span class="lnt">129
+&lt;/span>&lt;span class="lnt">130
+&lt;/span>&lt;span class="lnt">131
+&lt;/span>&lt;span class="lnt">132
+&lt;/span>&lt;span class="lnt">133
+&lt;/span>&lt;span class="lnt">134
+&lt;/span>&lt;span class="lnt">135
+&lt;/span>&lt;span class="lnt">136
+&lt;/span>&lt;span class="lnt">137
+&lt;/span>&lt;span class="lnt">138
+&lt;/span>&lt;span class="lnt">139
+&lt;/span>&lt;span class="lnt">140
+&lt;/span>&lt;span class="lnt">141
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># This pulls the latest Windows Server Datacenter from Microsoft&amp;#39;s VM platform directly
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_windows_virtual_machine&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;pdc&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_pdc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">size&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_size&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_username&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_password&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_password&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_ids&lt;/span> = &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os_disk&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">caching&lt;/span> = &lt;span class="s2">&amp;#34;ReadWrite&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">storage_account_type&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_sa_type&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">source_image_reference&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">publisher&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_publisher&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">offer&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_offer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sku&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_sku&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;latest&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">auto_logon&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;AutoLogon&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">first_logon_commands&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;FirstLogonCommands&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_windows_virtual_machine&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;rdc&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_rdc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">size&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_size&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_username&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_password&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_password&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_ids&lt;/span> = &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os_disk&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">caching&lt;/span> = &lt;span class="s2">&amp;#34;ReadWrite&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">storage_account_type&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_sa_type&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">source_image_reference&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">publisher&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_publisher&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">offer&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_offer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sku&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_sku&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;latest&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">auto_logon&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;AutoLogon&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">first_logon_commands&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;FirstLogonCommands&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_windows_virtual_machine&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;dhcp&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_dhcp&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">size&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_size&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_username&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_password&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_password&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_ids&lt;/span> = &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os_disk&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">caching&lt;/span> = &lt;span class="s2">&amp;#34;ReadWrite&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">storage_account_type&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_sa_type&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">source_image_reference&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">publisher&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_publisher&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">offer&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_offer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sku&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_sku&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;latest&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">auto_logon&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;AutoLogon&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">first_logon_commands&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;FirstLogonCommands&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv3&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_windows_virtual_machine&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;file&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_file&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">size&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_size&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_username&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_username&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_password&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winadmin_password&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_interface_ids&lt;/span> = &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv4&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os_disk&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">caching&lt;/span> = &lt;span class="s2">&amp;#34;ReadWrite&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">storage_account_type&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_sa_type&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">source_image_reference&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">publisher&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_publisher&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">offer&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_offer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sku&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv_vm_os_sku&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;latest&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">auto_logon&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;AutoLogon&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">additional_unattend_content&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">local&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">first_logon_commands&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">setting&lt;/span> = &lt;span class="s2">&amp;#34;FirstLogonCommands&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">east&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">winserv4&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="outputstf-file">outputs.tf File&lt;/h3>
+&lt;ul>
+&lt;li>Provides necessary ip information that is allocated to the VMs created.&lt;/li>
+&lt;li>This information by default includes:
+&lt;ul>
+&lt;li>Private IPs for all 5 deployed VMs (Which we know will by based on variables.tf file data)&lt;/li>
+&lt;li>Public IP for Linux machine (Not known by default, will be used for SSH connection if needed).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>outputs.tf&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;Public_IP_Linux&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_public_ip&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux_public&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ip_address&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;Public_IP_Windows&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_public_ip&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">win_public&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ip_address&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;Private_IP_Linux&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_network_interface&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">linux1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">private_ip_address&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;Private_IP_WinServ&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;PDC: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">azurerm_windows_virtual_machine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">pdc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">private_ip_address&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;RDC: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">azurerm_windows_virtual_machine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">rdc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">private_ip_address&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;DHCP: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">azurerm_windows_virtual_machine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">dhcp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">private_ip_address&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;FILE: &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">azurerm_windows_virtual_machine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nb">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">private_ip_address&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="cloud-init">Cloud-init&lt;/h2>
+&lt;p>Notice that in the 01-linux file, there is a cloud-init section, where the spun up machine will pull a cloud-init file. We must create that. Make a a folder inside your root terraform directory. Name it cloudinit. Inside that folder, create a file called &lt;code>custom.yml&lt;/code> containing the following.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="c">#cloud-config&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">apt_update&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">packages&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">python-pip&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">runcmd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">sudo pip install ansible&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">sudo ansible-galaxy install azure.azure_preview_modules&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">sudo pip install -r ~/.ansible/roles/azure.azure_preview_modules/files/requirements-azure.txt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">pip install &amp;#34;pywinrm&amp;gt;=0.2.2&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">cd /tmp/Ansible&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">sudo ansible-playbook winlab.yml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="useful-azure-related-functions">Useful Azure related functions&lt;/h2>
+&lt;p>Finding variable information for VM Images variables:&lt;/p>
+&lt;ul>
+&lt;li>You can use this command in Azure CLI to find UbuntuServer data. Change the values in offer, publisher, location, and sku for various other images.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Powershell" data-lang="Powershell">&lt;span class="line">&lt;span class="cl"> &lt;span class="n">az&lt;/span> &lt;span class="n">vm&lt;/span> &lt;span class="n">image&lt;/span> &lt;span class="n">list&lt;/span> &lt;span class="p">\&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">-&lt;/span>&lt;span class="n">-location&lt;/span> &lt;span class="n">westus&lt;/span> &lt;span class="p">\&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">-&lt;/span>&lt;span class="n">-publisher&lt;/span> &lt;span class="n">Canonical&lt;/span> &lt;span class="p">\&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">-&lt;/span>&lt;span class="n">-offer&lt;/span> &lt;span class="n">UbuntuServer&lt;/span> &lt;span class="p">\&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">-&lt;/span>&lt;span class="n">-sku&lt;/span> &lt;span class="mf">18.04&lt;/span>&lt;span class="n">-LTS&lt;/span> &lt;span class="p">\&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">-&lt;/span>&lt;span class="n">-all&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-output&lt;/span> &lt;span class="n">table&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&amp;ldquo;Check out Microsoft&amp;rsquo;s&amp;rdquo; &lt;a class="link" href="https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage" target="_blank" rel="noopener"
+>documentation&lt;/a> on finding VM information&lt;/li>
+&lt;/ul>
+&lt;h1 id="ansible">Ansible&lt;/h1>
+&lt;p>Main role: Configure the deployed Virtual Machines.&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;p>Check out the repository on &lt;a class="link" href="https://github.com/Cinderblook/Azure-Serv-Deploy" target="_blank" rel="noopener"
+>GitHub&lt;/a> for the configuration files!&lt;/p>
+&lt;ul>
+&lt;li>Setup Windows Server Feature: Domain
+&lt;ul>
+&lt;li>Primary Domain Controller&lt;/li>
+&lt;li>Replica Domain Controller&lt;/li>
+&lt;li>Auto-Join the Virutal Machines to the respective Domain created&lt;/li>
+&lt;li>Create a few users and groups within Active Directory&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup Windows Ssrver Feature: DHCP
+&lt;ul>
+&lt;li>Setup DHCP Scope&lt;/li>
+&lt;li>Authorize it to the Domain.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup Windows Server Feature: File Sharing
+&lt;ul>
+&lt;li>Create two shares
+&lt;ul>
+&lt;li>An employee share and administrator share. These shares are assigned group permissions.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Common Configurations
+&lt;ul>
+&lt;li>Enable RDP and allow it through the firewall on all windows servers created at server level&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ansible-variable-files">Ansible Variable files&lt;/h2>
+&lt;ul>
+&lt;li>&lt;em>inventory.yml&lt;/em>
+&lt;ul>
+&lt;li>Modify hosts associated with the playbook. Assign the IP addressing
+&lt;ul>
+&lt;li>&lt;strong>MUST MATCH &lt;em>terraform.tfvars&lt;/em> VARIABLE IP ADDRESSING&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>winlab.yml&lt;/em>
+&lt;ul>
+&lt;li>Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li>
+&lt;li>These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>ansible.cfg&lt;/em>
+&lt;ul>
+&lt;li>Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>./group_vars/all.yml&lt;/em>
+&lt;ul>
+&lt;li>Contains specific variable information used within the ./roles/* Ansible code.&lt;/li>
+&lt;li>Alter user, password, port, connection, and cert variable information&lt;/li>
+&lt;li>Alter domain variables as well&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="running-ansible">Running Ansible&lt;/h2>
+&lt;p>This is taken care of with terraform cloud-init file along with the file provisioner. The alternative would be below.&lt;/p>
+&lt;ul>
+&lt;li>On Linux Machine,
+&lt;ul>
+&lt;li>Requires: Python-pip, ansible-galaxzy-azure.azure_preview_modules&lt;/li>
+&lt;li>To Run: Navigate to Ansible directory and type &lt;code>ansible-playbook winlab.yml&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="useful-resources">Useful Resources&lt;/h1>
+&lt;h2 id="terraform-resources">Terraform Resources&lt;/h2>
+&lt;ul>
+&lt;li>Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
+>Documentation&lt;/a>&lt;/li>
+&lt;li>Azure &lt;a class="link" href="https://registry.terraform.io/providers/hashicorp/azurerm/2.96.0" target="_blank" rel="noopener"
+>Provider&lt;/a> &amp;amp; &lt;a class="link" href="https://registry.terraform.io/modules/Azure/compute/azurerm/latest" target="_blank" rel="noopener"
+>Modules&lt;/a>&lt;/li>
+&lt;li>Cloud-init &lt;a class="link" href="https://cloudinit.readthedocs.io/en/latest/" target="_blank" rel="noopener"
+>Documentation&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/hashicorp/terraform-provider-azurerm" target="_blank" rel="noopener"
+>terraform-provider-azurerm&lt;/a> examples and documentation on GitHub&lt;/li>
+&lt;/ul>
+&lt;h2 id="ansible-resources">Ansible Resources&lt;/h2>
+&lt;ul>
+&lt;li>Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
+>Documentation&lt;/a>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
+>Windows-Modules&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted -->
+To complete this project, 3 steps are taken.&lt;/p>
+&lt;ol>
+&lt;li>Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt&lt;/li>
+&lt;li>Use Terraform to deploy 4 virtual machines into a vSphere environment&lt;/li>
+&lt;li>Use Ansible to configure these 4 virtual machines as desired&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/vSphere/vSphere-WinServ-Deployment" target="_blank" rel="noopener"
+>GitHub (vSphere-WinServ-Deployment)&lt;/a> at the repository!&lt;/strong>&lt;/p>
+&lt;h2 id="1-packers-role">1. Packer&amp;rsquo;s Role:&lt;/h2>
+&lt;p>Create a Windows Server 2022 .iso that is updated and has VMTools installed by default using &lt;a class="link" href="https://www.packer.io/" target="_blank" rel="noopener"
+>Packer&lt;/a>. In this solution, it will be geared to usage with vSphere, a VMware product.&lt;/p>
+&lt;p>&lt;strong>First: Packer uses &lt;code>autounattend.xml&lt;/code> and &lt;code>sysprep-autounattend.xml&lt;/code> to automate Windows Settings&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>It pulls Windows Server 2022 Datacenter Eval Edition (Desktop Experience) from Microsoft&amp;rsquo;s site&lt;/li>
+&lt;li>Installs &amp;amp; configure OpenSSH Client &amp;amp; Server for remote connection&lt;/li>
+&lt;li>Installs VMware tools from ISO provided from the build ESX server&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Packer Provisioner Steps&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Updating OS via Windows Update&lt;/li>
+&lt;li>Doing some OS adjustments
+&lt;ul>
+&lt;li>Set Windows telemetry settings to minimum&lt;/li>
+&lt;li>Show file extentions by default&lt;/li>
+&lt;li>Install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+>Chocolatey&lt;/a> - a Windows package manager
+&lt;ul>
+&lt;li>Install Microsoft Edge (Chromium)&lt;/li>
+&lt;li>Install Win32-OpenSSH-Server&lt;/li>
+&lt;li>Install PowerShell Core&lt;/li>
+&lt;li>Install 7-Zip&lt;/li>
+&lt;li>Install Notepad++&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Enable Powershell-Core (&lt;code>pwsh&lt;/code>) to be the default SSHD shell&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Cleanup tasks&lt;/li>
+&lt;li>Remove CDROM drives from VM template (otherwise there would be 2)&lt;/li>
+&lt;/ul>
+&lt;h2 id="2-terraforms-role">2. Terraform&amp;rsquo;s Role:&lt;/h2>
+&lt;p>Main role: Deploy the Virtual Machines&lt;/p>
+&lt;ul>
+&lt;li>Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare)
+&lt;ul>
+&lt;li>Using the vSphere provider:
+&lt;ul>
+&lt;li>Assign appropriate resources to each machine&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Once prepared with appropriate values and the networking is in place:
+&lt;ul>
+&lt;li>Navigate to the Terraform directory and run these commands&lt;/li>
+&lt;li>&lt;code>terraform init&lt;/code> Pull proper Terraform providers and modules used&lt;/li>
+&lt;li>&lt;code>terraform validate&lt;/code> This will return whether the configuration is valid or not&lt;/li>
+&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code> Actually apply the configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="terraform-variable-files">Terraform Variable files&lt;/h2>
+&lt;ul>
+&lt;li>&lt;em>variables.tf&lt;/em>
+&lt;ul>
+&lt;li>Declare variables that will be used with the Terraform configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>terraform.tfvars&lt;/em>
+&lt;ul>
+&lt;li>Assign variables that will be used with the Terraform configuration&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="3-ansibles-role">3. Ansible&amp;rsquo;s Role:&lt;/h2>
+&lt;p>Main role: Configure the deployed Virtual Machines.&lt;/p>
+&lt;ul>
+&lt;li>Setup Windows Server Feature: Domain
+&lt;ul>
+&lt;li>Primary Domain Controller&lt;/li>
+&lt;li>Replica Domain Controller&lt;/li>
+&lt;li>Auto-Join the Virutal Machines to the respective Domain created&lt;/li>
+&lt;li>Create a few users and groups within Active Directory&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup Windows Ssrver Feature: DHCP
+&lt;ul>
+&lt;li>Setup DHCP Scope&lt;/li>
+&lt;li>Authorize it to the Domain.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Setup Windows Server Feature: File Sharing
+&lt;ul>
+&lt;li>Create two shares
+&lt;ul>
+&lt;li>An employee share and administrator share. These shares are assigned group permissions.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Common Configurations
+&lt;ul>
+&lt;li>Enable RDP and allow it through the firewall on all windows servers created&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ansible-variable-files">Ansible Variable files&lt;/h2>
+&lt;ul>
+&lt;li>&lt;em>inventory.yml&lt;/em>
+&lt;ul>
+&lt;li>Modify hosts associated with the playbook. Assign the IP addressing.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>winlab.yml&lt;/em>
+&lt;ul>
+&lt;li>Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li>
+&lt;li>These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>ansible.cfg&lt;/em>
+&lt;ul>
+&lt;li>Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>./group_vars/all.yml&lt;/em>
+&lt;ul>
+&lt;li>Contains specific variable information used within the ./roles/* Ansible code.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="prerequisites">Prerequisites&lt;/h1>
+&lt;ul>
+&lt;li>Linux machine with the following
+&lt;ul>
+&lt;li>Ansible
+&lt;ul>
+&lt;li>&lt;code>sudo apt update&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt install software-properties-common&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo add-apt-repository --yes --update ppa:ansible/ansible&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt install ansible&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Terraform
+&lt;ul>
+&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install -y gnupg software-properties-common curl&lt;/code>&lt;/li>
+&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install terraform&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Packer
+&lt;ul>
+&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install packer&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Git
+&lt;ul>
+&lt;li>&lt;code>sudo apt-get install git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>A Code Interprester
+&lt;ul>
+&lt;li>I recommend &lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
+>Visual-Studio-Code&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>vSphere Lab Environment
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.vmware.com/products/vsphere.html" target="_blank" rel="noopener"
+>vSphere&lt;/a> &amp;mdash; &lt;em>Note: This project is using vSphere version 7.0.0&lt;/em>
+&lt;!-- raw HTML omitted -->&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="packer">Packer&lt;/h1>
+&lt;h2 id="navigate-to-packer-directory">Navigate to Packer Directory&lt;/h2>
+&lt;ul>
+&lt;li>First setup Packer environment
+&lt;ul>
+&lt;li>&lt;code>packer init -upgrade ws2022.pkr.hcl&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Then apply the Packer configuration to create the Windows Server 2022 Image
+&lt;ul>
+&lt;li>&lt;code>packer build -timestamp-ui -force -var-file=myvarfile.json ws2022.pkr.hcl&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;ul>
+&lt;li>This packer execute pulls the newest windows server datacenter 2022 eval .iso from microsoft populates it into the vSphere environment, in the specified datacenter/cluster/host/datastore&lt;/li>
+&lt;li>It then runs commands to: Grab DHCP, Updates the image, Enables SSH, Enables RDP, Configures necessary firewall settings, sets passwords/usernames, &amp;amp; installs VMware Tools to base image&lt;/li>
+&lt;li>Additionally, it will install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+>Chocolatey&lt;/a> for packages, notepad++, Edge, &amp;amp; 7-zip
+&lt;!-- raw HTML omitted -->&lt;/li>
+&lt;/ul>
+&lt;h2 id="after-packer-finishes">After Packer Finishes&lt;/h2>
+&lt;h6 id="roughly-an-hour-depending-on-processing-and-internet-speed">&lt;em>Roughly an hour depending on processing and internet speed&lt;/em>&lt;/h6>
+&lt;ul>
+&lt;li>Go into your vSphere and turn the resulting VM into a Template
+&lt;ul>
+&lt;li>Ensure this mimics the variables you have set in the terraform.tfvars file. This will be our next step.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="terraform">Terraform&lt;/h1>
+&lt;h2 id="navigate-to-terraform-directory">Navigate to Terraform Directory&lt;/h2>
+&lt;ul>
+&lt;li>Setup Terraform Environemnt
+&lt;ul>
+&lt;li>&lt;code>terraform init&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Format terraform to ensure it meets criteria required
+&lt;ul>
+&lt;li>&lt;code>terraform fmt&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Do a terraform plan to detect any potential errors in code and to see potential end result. Read over this
+&lt;ul>
+&lt;li>&lt;code>terraform plan&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Finally, if all the above appears correct, perform a terraform apply
+&lt;ul>
+&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code>
+&lt;ul>
+&lt;li>This may take awhile, once it is done, double check in vSphere all necessary Virtual Machines were created properly &lt;em>(For me this took 20 minutes to fully complete)&lt;/em>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="ansible">Ansible&lt;/h1>
+&lt;h2 id="navigate-to-ansible-directory">Navigate to Ansible Directory&lt;/h2>
+&lt;ul>
+&lt;li>Once you have allowed Terraform to finish its configuraiton:
+&lt;ul>
+&lt;li>Navigate to your Ansible Directory, &lt;code>cd &amp;lt;path-to-Ansible&amp;gt;&lt;/code>&lt;/li>
+&lt;li>Run your ansible playbook &lt;code>ansible-playbook winlab.yml&lt;/code>
+&lt;ul>
+&lt;li>This should run through and detail each change as it plays out&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h1 id="references-useduseful-links">References Used/Useful Links&lt;/h1>
+&lt;h3 id="i-sourced-various-code-and-peices-of-information-from-the-following-git-repositories">I sourced various code and peices of information from the following Git Repositories&lt;/h3>
+&lt;ul>
+&lt;li>Stefan Zimmermann &lt;a class="link" href="https://gitlab.com/StefanZ8n/packer-ws2022" target="_blank" rel="noopener"
+>GitLab&lt;/a> &lt;a class="link" href="https://z8n.eu/2021/11/09/building-a-windows-server-2022-ova-with-packer/" target="_blank" rel="noopener"
+>Article&lt;/a>&lt;/li>
+&lt;li>Dmitry Teslya &lt;a class="link" href="https://github.com/dteslya/win-iac-lab" target="_blank" rel="noopener"
+>GitHub&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="useful-places-for-refernece">Useful places for refernece&lt;/h3>
+&lt;ul>
+&lt;li>Tutorials for Terraform, Packer, and others &lt;a class="link" href="https://learn.hashicorp.com/search?query=Packer" target="_blank" rel="noopener"
+>Hashicorp-Tutorials&lt;/a>&lt;/li>
+&lt;li>Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
+>Documentation&lt;/a>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
+>Windows-Modules&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
+>Documentation&lt;/a>&lt;/li>
+&lt;li>Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
+>Documentation&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
