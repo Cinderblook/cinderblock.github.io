@@ -1,76 +1,156 @@
-languageCode = 'en-us'
-baseurl = "https://www.cinderblock.tech/"
-metaDataFormat = "yaml"
-title = "Austin Barnes"
-theme = "blist"
-
+baseurl = "https://cinderblock.github.io"
+languageCode = "en-us"
+theme = "stack"
+paginate = 5
+title = "Cinderblock"
+#googleAnalytics = ""
 DefaultContentLanguage = "en"
-DefaultContentLanguageInSubdir = true
+hasCJKLanguage = false
+disqusShortname = "cinderblock"
+
+[permalinks]
+post = "/p/:slug/"
+page = "/:slug/"
+
+[languages.en]
+languageName = "English"
+title = "Cinderblock"
+weight = 1
 
 [params]
-  # Enable the darkmode toggle in header
-  darkModeToggle = true
+mainSections = [ "post" ]
+featuredImageField = "image"
+rssFullContent = true
+favicon = "images/favicon-32x32.png"
+
+  [params.footer]
+  since = 2_021
+  customText = "Enthusiastic guy who enjoys the outdoors, flying drones, homelabbing, and of course, all things tech."
+
+  [params.dateFormat]
+  published = "Jan 02, 2006"
+  lastUpdated = "Jan 02, 2006 15:04 MST"
+
+  [params.sidebar]
+  #emoji = ""
+  subtitle = "Hey! I'm Austin."
+
+    [params.sidebar.avatar]
+    enabled = true
+    local = true
+    src = "img/Portrait_Austin.jpg"
+
+  [params.article]
+  math = false
+  toc = true
+  readingTime = true
+
+    [params.article.license]
+    enabled = true
+    default = "Licensed under CC BY-NC-SA 4.0"
+
+  [params.comments]
+  enabled = true
+  provider = "disqus"
+
+    [params.comments.disqusjs]
+    shortname = "cinderblock"
+
+[[params.widgets.homepage]]
+type = "search"
+
+[[params.widgets.homepage]]
+type = "archives"
+
+  [params.widgets.homepage.params]
+  limit = 5
+
+#[[params.widgets.homepage]]
+#type = "tag-cloud"
+
+#  [params.widgets.homepage.params]
+#  limit = 1
+
+[[params.widgets.homepage]]
+type = "categories"
+
+  [params.widgets.homepage.params]
+  limit = 15
+
+[[params.widgets.page]]
+type = "toc"
+
+  [params.colorScheme]
+  toggle = true
+  default = "auto"
+
+[params.imageProcessing.cover]
+enabled = true
+
+[params.imageProcessing.content]
+enabled = true
+
+[menu]
+main = [ ]
+
+  [[menu.social]]
+  identifier = "buymeacoffee"
+  name = "Buy Me a Coffee"
+  url = "https://www.buymeacoffee.com/cinderblook"
+
+    [menu.social.params]
+    icon = "buymeacoffee"
+
+  [[menu.social]]
+  identifier = "github"
+  name = "GitHub"
+  url = "https://github.com/Cinderblook"
+
+    [menu.social.params]
+    icon = "github"
+
+  [[menu.social]]
+  identifier = "linkedin"
+  name = "linkedin"
+  url = "https://www.linkedin.com/in/austin-barnes-03869218a/"
+
+    [menu.social.params]
+    icon = "linkedin"
+
+  [[menu.social]]
+  identifier = "instagram"
+  name = "Instagram"
+  url = "https://www.instagram.com/austin_barnesz/"
+
+    [menu.social.params]
+    icon = "instagram"
+
+[related]
+includeNewer = true
+threshold = 60
+toLower = false
+
+  [[related.indices]]
+  name = "categories"
+  weight = 100  
   
-  # Enable search in header
-  enableSearch = true
+  [[related.indices]]
+  name = "tags"
+  weight = 200
 
-  # Custom copyright - optional
-  copyright = "Copyright © 2021 - Austin Barnes · All rights reserved"
-  favicon = "/favicon.svg"
+[markup.goldmark.renderer]
+unsafe = false
 
-  # Color for the intro details and social links block, not applicable for dark mode
-  # Supported values: Any color from TailwindCSS default colors
-  # Reference: https://tailwindcss.com/docs/customizing-colors
-  ascentColor = "bg-blue-100"
+[markup.tableOfContents]
+endLevel = 4
+ordered = true
+startLevel = 2
 
-  # The page bundle that is shown on the front page
-  frontBundle = "blog"
-  # Front Page
-  introTitle = "Hey! I'm Austin"
-  introSubtitle = "Enthusiastic guy who enjoys the outdoors, flying drones, homelabbing, and of course, all things tech."
-  introPhoto = "/Portrait_Austin.jpg"
-  #logo = "/portrait_Austin.jpg"
-
-[params.homepage.social]
-  # Global params 
-  title = "Follow me"
-  description = "I put a little bit of everything on here, so follow along in my journey if you wish"
-  linkedin = "https://www.linkedin.com/in/austin-barnes-03869218a/"
-  instagram = "https://www.instagram.com/austin_barnesz/"
-  github = "https://github.com/Cinderblook"
-  coffeescript = "https://www.buymeacoffee.com/cinderblook"
-  
- [[menu.main]]
-     name = "Blog"
-     url = "blog"
-     weight = 1
- [[menu.main]]
-     name = "About"
-     url = "page/about/"
-     weight = 2
- [[menu.main]]
-     name = "Tags"
-     url = "tags"
-     weight = 3
- [[menu.main]]
-     name = "Sites"
-     url = "page/sites/"
-     weight = 4
-  [[menu.main]]
-    name = "Github"
-    url = "https://github.com/Cinderblook"
-    weight = 4
-
-[build]
-  writeStats = true
-
-[outputs]
-  home = ["HTML", "RSS", "JSON"]
-
-# syntax highlight settings
-[markup]
-  [markup.highlight]
-    style = "dracula"
-  [markup.goldmark.renderer]
-    # Enable to include inline HTML
-    unsafe = true
+[markup.highlight]
+noClasses = false
+codeFences = true
+guessSyntax = true
+lineNoStart = 1
+lineNos = true
+lineNumbersInTable = true
+tabWidth = 4

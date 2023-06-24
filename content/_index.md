@@ -1,6 +1,8 @@
 ---
-author: Austin Barnes
-title: Realm of Austin Barnes
-date: 2022-03-30
+menu:
+    main:
+        name: Home
+        weight: -100
+        params:
+            icon: home
 ---
-

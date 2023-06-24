@@ -1,43 +1,31 @@
-name: github pages
+name: Update GitHub Pages Site
 
 on:
   push:
     branches:
-      - main  # Set a branch to deploy
+      - main
   pull_request:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
-          
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-        
-      - name: Install dependencies
-        run: |
-          npm install postcss -D
-          npm install -g postcss-cli
-          npm install -g autoprefixer
-          
+          submodules: true
+          fetch-depth: 0
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
-          # extended: true
+          extended: true
 
       - name: Build
-        run: npm i && hugo -D --gc #hugo --minify
+        run: hugo --minify
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
-        #if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.CINDERBLOCK_TECH }}
           publish_dir: ./public

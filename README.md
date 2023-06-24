@@ -1,28 +1,21 @@
 # Personal Site
-cinderblock.github.io & www.cinderblock.tech
+www.cinderblock.tech & cinderblock.github.io
+   - (Formally - cinderblook.github.io/cinderblook.com)
 
-# How to install Hugo conditioned for POSTCSS
-1. Commands to Setup npm versioning (Should be V.14)
-   1.  ``` bash
-       sudo apt update
-       sudo apt install nodejs npm
-       curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-       sudo apt install nodejs
-       ```
-2. Setup Hugo 
-   1. ```
-      wget https://github.com/gohugoio/hugo/releases/download/v0.98.0/hugo_extended_0.98.0_Linux-64bit.deb
-      dpkg --install hugo_extended_0.98.0_Linux-64bit.deb
+# GitHub Pages Workflow
+Checkout what is in my .github/workflows/cinderbock.yml file to see the automated configuration to get Hugo to update the GitHub page.
     
-3. Build site using Blist
-   1. ``` bash
-      hugo new site test-blist
-      cd test-blist
-      git clone https://github.com/apvarun/blist-hugo-theme.git themes/blist
-      cp themes/blist/package.json ./package.json
-      cp themes/blist/package-lock.json ./package-lock.json
-      npm install
-      npm i -g postcss-cli
-      echo "theme = \"blist\"" >> config.toml
-      hugo serve
-      ```
+# Host local to test changes before deployment
+(If WindowS)
+- Install Choco
+- Install Hugp
+- Install Git
+- Install Go
+
+After installing all of these, navigate to your Hugo server folder, and run:
+
+```bash
+hugo server
+```
+
+Look at the locally hosted server at http://localhost:1313
