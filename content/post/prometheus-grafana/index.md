@@ -4,7 +4,7 @@ title: "Prometheus + Grafana monitoring"
 description: "A solution for homelab monitoring of core systems."
 tags: ["prometheus", "grafana", "github", "database", "homelab"]
 categories: ["Monitoring","Database","Docker"]
-date: 2023-07-3
+date: 2023-07-03
 image: prometheus-grafana-banner.png
 ---
 
