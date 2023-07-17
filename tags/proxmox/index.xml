@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>proxmox on Cinderblock</title><link>https://cinderblock.github.io/tags/proxmox/</link><description>Recent content in proxmox on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 16 Jul 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/proxmox/index.xml" rel="self" type="application/rss+xml"/><item><title>'Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post 'Migrating Proxmox Raw LVM to VMDK for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>proxmox on Cinderblock</title><link>https://cinderblock.github.io/tags/proxmox/</link><description>Recent content in proxmox on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 16 Jul 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/proxmox/index.xml" rel="self" type="application/rss+xml"/><item><title>Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post Migrating Proxmox Raw LVM to VMDK for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
 &lt;p>Converting a Proxmox virtual machine to a vmdk for VMWare. In this, I will be doing so with virtual machines in LVM Raw format in Proxmox, into VMDKs for transfer from the Proxmox Hyper-viser to a ESXI hyper-viser.&lt;/p>
 &lt;h2 id="find-critical-data-of-proxmox-vm">Find critical data of Proxmox VM&lt;/h2>
 &lt;p>First within Proxmox, navigate to the VM in question, and see its location, and data type. Assuming it may be a LVM. Ensure you write down the total CPU count and RAM usage, as it should mirror it on first startup in VMWare. Otherwise it may corrupt.&lt;/p>
@@ -20,8 +20,6 @@
 &lt;h2 id="convert-disk-from-lvm-to-vmdk">Convert disk from LVM to VMDK&lt;/h2>
 &lt;ul>
 &lt;li>Once disk is found, convert it to a vmdk
-&lt;ul>
-&lt;li>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
@@ -32,13 +30,9 @@
 &lt;/div>
 &lt;/div>&lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;/ul>
 &lt;h2 id="move-the-disk">Move the disk&lt;/h2>
 &lt;ul>
 &lt;li>Copy disk over to your VMWare host (Or specified storage location)
-&lt;ul>
-&lt;li>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
@@ -49,26 +43,20 @@
 &lt;/div>
 &lt;/div>&lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;/ul>
 &lt;h2 id="clone-to-a-thin-provision">Clone to a thin provision&lt;/h2>
 &lt;p>I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.&lt;/p>
 &lt;ul>
 &lt;li>
 &lt;p>SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.&lt;/p>
-&lt;ul>
-&lt;li>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
 &lt;/span>&lt;/code>&lt;/pre>&lt;/td>
 &lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl"> vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;/li>
-&lt;/ul>
-&lt;/li>
 &lt;/ul>
 &lt;h2 id="create-virtual-machine-in-vcenter">Create Virtual Machine in vCenter&lt;/h2>
 &lt;p>In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)&lt;/p>
