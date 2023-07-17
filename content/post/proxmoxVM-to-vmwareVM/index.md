@@ -1,6 +1,6 @@
 ---
 author: "Austin Barnes"
-title: "'Migrating Proxmox Raw LVM to VMDK for VMWare"
+title: "Migrating Proxmox Raw LVM to VMDK for VMWare"
 description: "Converting Proxmox virtual machine to a suitable format for VMWare."
 tags: ["VMWare","Proxmox"]
 categories: ["VMWare","Proxmox"]
@@ -28,24 +28,24 @@ First within Proxmox, navigate to the VM in question, and see its location, and 
     
 ## Convert disk from LVM to VMDK
 - Once disk is found, convert it to a vmdk
-  - ``` bash
-    qemu-img convert -f raw /dev/storage/vm-<vmid>-disk-0 -O vmdk <name-of-vmdk-file-to-create> 
-    ```
+  ``` bash
+  qemu-img convert -f raw /dev/storage/vm-<vmid>-disk-0 -O vmdk <name-of-vmdk-file-to-create> 
+  ```
 
 ## Move the disk
 - Copy disk over to your VMWare host (Or specified storage location)
-  - ``` bash 
-    scp <disk-location> <user>@<ip/fqdn>:<destination-file>
-    ```
+  ``` bash 
+  scp <disk-location> <user>@<ip/fqdn>:<destination-file>
+  ```
 
 ## Clone to a thin provision
 I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.
 
 - SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.
 
-  - ```bash
-     vmkfstools -i <copied-file-name>.vmdk <new-file-name>.vmdk -d thin
-    ```
+  ```bash
+  vmkfstools -i <copied-file-name>.vmdk <new-file-name>.vmdk -d thin
+  ```
 
 ## Create Virtual Machine in vCenter
 In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)
