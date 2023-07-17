@@ -64,40 +64,40 @@ Ensure docker-compose is installed</p><ul><li><code>sudo curl -L "https://github
 </span><span class=lnt>32
 </span><span class=lnt>33
 </span><span class=lnt>34
-</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>events{}
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-conf data-lang=conf><span class=line><span class=cl><span class=nv>events</span><span class=p>{}</span>
 </span></span><span class=line><span class=cl> 
-</span></span><span class=line><span class=cl> stream {
-</span></span><span class=line><span class=cl>     upstream k3s_servers {
-</span></span><span class=line><span class=cl>         server &lt;IP_MASTER_NODE_1&gt;:6443;
-</span></span><span class=line><span class=cl>         server &lt;IP_MASTER_NODE_2&gt;:6443;
-</span></span><span class=line><span class=cl>     }
+</span></span><span class=line><span class=cl> <span class=nv>stream</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nv>upstream</span> <span class=nv>k3s_servers</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>         <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_MASTER_NODE_1</span><span class=err>&gt;:</span><span class=nv>6443</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>         <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_MASTER_NODE_2</span><span class=err>&gt;:</span><span class=nv>6443</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>     <span class=p>}</span>
 </span></span><span class=line><span class=cl> 
-</span></span><span class=line><span class=cl>     server {
-</span></span><span class=line><span class=cl>         listen 6443;
-</span></span><span class=line><span class=cl>         proxy_pass k3s_servers;
-</span></span><span class=line><span class=cl>     }
-</span></span><span class=line><span class=cl>     upstream rancher_servers_http {
-</span></span><span class=line><span class=cl> 	    least_conn;
-</span></span><span class=line><span class=cl> 	    server &lt;IP_NODE_1&gt;:80 max_fails=3 fail_timeout=5s;
-</span></span><span class=line><span class=cl> 	    server &lt;IP_NODE_2&gt;:80 max_fails=3 fail_timeout=5s;
-</span></span><span class=line><span class=cl> 	    server &lt;IP_NODE_3&gt;:80 max_fails=3 fail_timeout=5s;
-</span></span><span class=line><span class=cl> 	}
-</span></span><span class=line><span class=cl> 	server {
-</span></span><span class=line><span class=cl> 	    listen 80;
-</span></span><span class=line><span class=cl> 	    proxy_pass rancher_servers_http;
-</span></span><span class=line><span class=cl> 	}
+</span></span><span class=line><span class=cl>     <span class=nv>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>         <span class=nv>listen</span> <span class=nv>6443</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>         <span class=nv>proxy_pass</span> <span class=nv>k3s_servers</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>     <span class=p>}</span>
+</span></span><span class=line><span class=cl>     <span class=nv>upstream</span> <span class=nv>rancher_servers_http</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>least_conn</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_NODE_1</span><span class=err>&gt;:</span><span class=nv>80</span> <span class=nv>max_fails</span><span class=o>=</span><span class=nv>3</span> <span class=nv>fail_timeout</span><span class=o>=</span><span class=nv>5s</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_NODE_2</span><span class=err>&gt;:</span><span class=nv>80</span> <span class=nv>max_fails</span><span class=o>=</span><span class=nv>3</span> <span class=nv>fail_timeout</span><span class=o>=</span><span class=nv>5s</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_NODE_3</span><span class=err>&gt;:</span><span class=nv>80</span> <span class=nv>max_fails</span><span class=o>=</span><span class=nv>3</span> <span class=nv>fail_timeout</span><span class=o>=</span><span class=nv>5s</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	<span class=p>}</span>
+</span></span><span class=line><span class=cl> 	<span class=nv>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>listen</span> <span class=nv>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>proxy_pass</span> <span class=nv>rancher_servers_http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	<span class=p>}</span>
 </span></span><span class=line><span class=cl> 	
-</span></span><span class=line><span class=cl> 	upstream rancher_servers_https {
-</span></span><span class=line><span class=cl> 	    least_conn;
-</span></span><span class=line><span class=cl> 	    server &lt;IP_NODE_1&gt;:443 max_fails=3 fail_timeout=5s;
-</span></span><span class=line><span class=cl> 	    server &lt;IP_NODE_2&gt;:443 max_fails=3 fail_timeout=5s;
-</span></span><span class=line><span class=cl> 	    server &lt;IP_NODE_3&gt;:443 max_fails=3 fail_timeout=5s;
-</span></span><span class=line><span class=cl> 	}
-</span></span><span class=line><span class=cl> 	server {
-</span></span><span class=line><span class=cl> 	    listen     443;
-</span></span><span class=line><span class=cl> 	    proxy_pass rancher_servers_https;
-</span></span><span class=line><span class=cl> 	}
-</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl> 	<span class=nv>upstream</span> <span class=nv>rancher_servers_https</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>least_conn</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_NODE_1</span><span class=err>&gt;:</span><span class=nv>443</span> <span class=nv>max_fails</span><span class=o>=</span><span class=nv>3</span> <span class=nv>fail_timeout</span><span class=o>=</span><span class=nv>5s</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_NODE_2</span><span class=err>&gt;:</span><span class=nv>443</span> <span class=nv>max_fails</span><span class=o>=</span><span class=nv>3</span> <span class=nv>fail_timeout</span><span class=o>=</span><span class=nv>5s</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>server</span> <span class=err>&lt;</span><span class=nv>IP_NODE_3</span><span class=err>&gt;:</span><span class=nv>443</span> <span class=nv>max_fails</span><span class=o>=</span><span class=nv>3</span> <span class=nv>fail_timeout</span><span class=o>=</span><span class=nv>5s</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	<span class=p>}</span>
+</span></span><span class=line><span class=cl> 	<span class=nv>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>listen</span>     <span class=nv>443</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	    <span class=nv>proxy_pass</span> <span class=nv>rancher_servers_https</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> 	<span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></td></tr></table></div></div><ul><li>Commands to setup:<ul><li>Change nginx.conf file to match your configuration</li><li>Enter file directory of nginx and apply <code>sudo docker-compose up -d</code></li></ul></li></ul><h1 id=2-setup-mysql-docker>2. Setup MySQL Docker</h1><p>On the same dedicated docker host that the nginx loadbalancer is running on:
 Create new directory for mysql and put a docker-compose.yml file in it with the following:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2

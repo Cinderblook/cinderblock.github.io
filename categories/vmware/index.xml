@@ -1,4 +1,79 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMware on Cinderblock</title><link>https://cinderblock.github.io/categories/vmware/</link><description>Recent content in VMware on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 14 Feb 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMWare on Cinderblock</title><link>https://cinderblock.github.io/categories/vmware/</link><description>Recent content in VMWare on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 16 Jul 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>'Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post 'Migrating Proxmox Raw LVM to VMDK for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>Converting a Proxmox virtual machine to a vmdk for VMWare. In this, I will be doing so with virtual machines in LVM Raw format in Proxmox, into VMDKs for transfer from the Proxmox Hyper-viser to a ESXI hyper-viser.&lt;/p>
+&lt;h2 id="find-critical-data-of-proxmox-vm">Find critical data of Proxmox VM&lt;/h2>
+&lt;p>First within Proxmox, navigate to the VM in question, and see its location, and data type. Assuming it may be a LVM. Ensure you write down the total CPU count and RAM usage, as it should mirror it on first startup in VMWare. Otherwise it may corrupt.&lt;/p>
+&lt;ul>
+&lt;li>Gather data for VM in question:
+&lt;ul>
+&lt;li>&lt;code>qm status &amp;lt;vmid&amp;gt;&lt;/code>&lt;/li>
+&lt;li>&lt;code>qm config &amp;lt;vmid&amp;gt;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Find pathing:
+&lt;ul>
+&lt;li>&lt;code>pvesm path &amp;lt;storage-identifier&amp;gt;:&amp;lt;disk&amp;gt;&lt;/code>&lt;/li>
+&lt;li>&lt;code>lvdisplay /dev/&amp;lt;storage&amp;gt;/vm-&amp;lt;vmid&amp;gt;-disk-0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>If you cannot find it, I have noticed Proxmox likes to deactivate LVMs once the VM is offline. You can change this by running &lt;code>lvscan&lt;/code>, and then running &lt;code>lvchange --activate /dev/&amp;lt;storage-pool&amp;gt;/&amp;lt;Disk-ID&amp;gt;&lt;/code>&lt;/em>&lt;/p>
+&lt;h2 id="convert-disk-from-lvm-to-vmdk">Convert disk from LVM to VMDK&lt;/h2>
+&lt;ul>
+&lt;li>Once disk is found, convert it to a vmdk
+&lt;ul>
+&lt;li>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qemu-img convert -f raw /dev/storage/vm-&amp;lt;vmid&amp;gt;-disk-0 -O vmdk &amp;lt;name-of-vmdk-file-to-create&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="move-the-disk">Move the disk&lt;/h2>
+&lt;ul>
+&lt;li>Copy disk over to your VMWare host (Or specified storage location)
+&lt;ul>
+&lt;li>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">scp &amp;lt;disk-location&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;ip/fqdn&amp;gt;:&amp;lt;destination-file&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="clone-to-a-thin-provision">Clone to a thin provision&lt;/h2>
+&lt;p>I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl"> vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="create-virtual-machine-in-vcenter">Create Virtual Machine in vCenter&lt;/h2>
+&lt;p>In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)&lt;/p>
+&lt;p>Again, ensure your RAM/CPU configuration matches that of the Proxmox configuration.&lt;/p>
+&lt;p>If it fails, just try again, its easy to miss one step and have an issue here.&lt;/p></description></item><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
 &lt;p>The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted -->
 To complete this project, 3 steps are taken.&lt;/p>
 &lt;ol>

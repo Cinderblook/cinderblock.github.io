@@ -3111,40 +3111,40 @@ Ensure docker-compose is installed&lt;/p>
 &lt;/span>&lt;span class="lnt">34
 &lt;/span>&lt;/code>&lt;/pre>&lt;/td>
 &lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">events{}
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-conf" data-lang="conf">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">events&lt;/span>&lt;span class="p">{}&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> stream {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> upstream k3s_servers {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_MASTER_NODE_1&amp;gt;:6443;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_MASTER_NODE_2&amp;gt;:6443;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">stream&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">upstream&lt;/span> &lt;span class="nv">k3s_servers&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_MASTER_NODE_1&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">6443&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_MASTER_NODE_2&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">6443&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 6443;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass k3s_servers;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> upstream rancher_servers_http {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> least_conn;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_NODE_1&amp;gt;:80 max_fails=3 fail_timeout=5s;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_NODE_2&amp;gt;:80 max_fails=3 fail_timeout=5s;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_NODE_3&amp;gt;:80 max_fails=3 fail_timeout=5s;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 80;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass rancher_servers_http;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">listen&lt;/span> &lt;span class="nv">6443&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">proxy_pass&lt;/span> &lt;span class="nv">k3s_servers&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">upstream&lt;/span> &lt;span class="nv">rancher_servers_http&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">least_conn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_1&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">80&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_2&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">80&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_3&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">80&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">listen&lt;/span> &lt;span class="nv">80&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">proxy_pass&lt;/span> &lt;span class="nv">rancher_servers_http&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> upstream rancher_servers_https {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> least_conn;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_NODE_1&amp;gt;:443 max_fails=3 fail_timeout=5s;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_NODE_2&amp;gt;:443 max_fails=3 fail_timeout=5s;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server &amp;lt;IP_NODE_3&amp;gt;:443 max_fails=3 fail_timeout=5s;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server {
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 443;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass rancher_servers_https;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">upstream&lt;/span> &lt;span class="nv">rancher_servers_https&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">least_conn&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_1&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">443&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_2&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">443&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_3&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">443&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">listen&lt;/span> &lt;span class="nv">443&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">proxy_pass&lt;/span> &lt;span class="nv">rancher_servers_https&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;ul>
