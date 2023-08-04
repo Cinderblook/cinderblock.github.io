@@ -1,3 +1,12 @@
+---
+author: "Austin Barnes"
+title: "Utilizing USB to Eth for VMWare"
+description: "USB to Eth on ESXI hosts as a solution to additional Network Interfaces."
+tags: ["VMWare","Network"]
+categories: ["VMWare","Network"]
+date: 2023-08-04
+image: USB-to-ETH-VMWARE.png
+---
 # Overview
 
 I stumbled upon a collection of affordable Dell Optiplex 7060 Micros, equipped with exceptional specs for a homelab cluster ESXi environment. However, I faced a challenge in having only one Ethernet interface on each host, when I needed dedicated ISCSI storage on a separate interface. I found a solution using custom drivers for specific USB to Ethernet adapters, supported unofficially by VMware staff.
