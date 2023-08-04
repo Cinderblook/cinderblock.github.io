@@ -8000,4 +8000,103 @@ To complete this project, 3 steps are taken.&lt;/p>
 >Documentation&lt;/a>&lt;/li>
 &lt;li>Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
 >Documentation&lt;/a>&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;/ul></description></item><item><title/><link>https://cinderblock.github.io/p/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/</guid><description>&lt;h1 id="overview">Overview&lt;/h1>
+&lt;p>I stumbled upon a collection of affordable Dell Optiplex 7060 Micros, equipped with exceptional specs for a homelab cluster ESXi environment. However, I faced a challenge in having only one Ethernet interface on each host, when I needed dedicated ISCSI storage on a separate interface. I found a solution using custom drivers for specific USB to Ethernet adapters, supported unofficially by VMware staff.&lt;/p>
+&lt;h2 id="choosing-the-adapters">Choosing the Adapters&lt;/h2>
+&lt;p>Make sure to select a USB to Ethernet adapter that&amp;rsquo;s compatible. See a list of &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#requirements" target="_blank" rel="noopener"
+>officially unsupported but working adapters on VMware&amp;rsquo;s site&lt;/a>, or choose the one I used &lt;a class="link" href="https://www.amazon.com/dp/B00YUU3KC6?psc=1&amp;amp;ref=ppx_yo2ov_dt_b_product_details" target="_blank" rel="noopener"
+>from Amazon&lt;/a>.&lt;/p>
+&lt;ul>
+&lt;li>The adapter I chose, is a TP-Link E300, with a Realtek RTL8153 chip, that supports 10/100/1000MB speeds.&lt;/li>
+&lt;/ul>
+&lt;h2 id="physical-and-ssh-access">Physical and SSH Access&lt;/h2>
+&lt;p>You&amp;rsquo;ll need physical access to install the adapters and connect them to the network (either directly to the ISCSI interface or through a dedicated VLAN). On the ESXi host(s), go to &lt;a class="link" href="https://ip.address:443" target="_blank" rel="noopener"
+>https://ip.address:443&lt;/a> to enable SSH if needed.&lt;/p>
+&lt;h2 id="installing-the-vmware-driver">Installing the VMware Driver&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>Download the driver from &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#summary" target="_blank" rel="noopener"
+>VMware&lt;/a>. Ensure the correct version based on the ESXi hosts.&lt;/p>
+&lt;ul>
+&lt;li>Do a quick check on the host with &lt;code>vmware -v&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Transfer it to the host(s) and install:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">scp /file/location &amp;lt;user&amp;gt;@&amp;lt;ip-esxi-host&amp;gt;:/location/to/put/file
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ssh &amp;lt;user&amp;gt;@&amp;lt;ip&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">esxcli software component apply -d /path/to/the component zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;h2 id="configuring-usb-to-ethernet-usage">Configuring USB to Ethernet Usage&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>After rebooting, create a new NIC on the ESXi host or in vSphere.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Confirm proper configuration within the GUI, then run within the SSH console:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">esxcli system module parameters &lt;span class="nb">set&lt;/span> -p &lt;span class="s2">&amp;#34;usbBusFullScanOnBootEnabled=1&amp;#34;&lt;/span> -m vmkusb_nic_fling
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Edit the local.sh file:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vi /etc/rc.local.d/local.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Add this snippet:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">vusb0_status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>esxcli network nic get -n vusb0 &lt;span class="p">|&lt;/span> grep &lt;span class="s1">&amp;#39;Link Status&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{print $NF}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="o">[[&lt;/span> &lt;span class="nv">$count&lt;/span> -lt &lt;span class="m">20&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">vusb0_status&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> !&lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;Up&amp;#34;&lt;/span> &lt;span class="o">]]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sleep &lt;span class="m">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$((&lt;/span> &lt;span class="nv">$count&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="k">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">vusb0_status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>esxcli network nic get -n vusb0 &lt;span class="p">|&lt;/span> grep &lt;span class="s1">&amp;#39;Link Status&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{print $NF}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">esxcfg-vswitch -R
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Add the provided code, and if you need support for multiple adapters, see more details &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#instructions" target="_blank" rel="noopener"
+>here&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="conclusion">Conclusion&lt;/h2>
+&lt;p>Verify the network connectivity, and you&amp;rsquo;ll now have a dedicated management port and an additional ISCSI NAS port for HA failover. Additionally, if you are like me, an affordable solution created to creating additional network interfaces on a Dell Optiplex 7060 Micro!&lt;/p></description></item></channel></rss>
