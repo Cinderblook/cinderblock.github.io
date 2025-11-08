@@ -1,7 +1,8 @@
 baseurl = "https://cinderblock.github.io" 
 languageCode = "en-us"
 theme = "stack"
-paginate = 5
+[pagination]
+  pagerSize = 10
 title = "Cinderblock"
 googleAnalytics = "G-SJ16DM3169"
 DefaultContentLanguage = "en"
