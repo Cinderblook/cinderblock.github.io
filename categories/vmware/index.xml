@@ -1,439 +1,439 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMWare on Cinderblock</title><link>https://cinderblock.github.io/categories/vmware/</link><description>Recent content in VMWare on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 04 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>Utilizing USB to Eth for VMWare</title><link>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</link><pubDate>Fri, 04 Aug 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/USB-to-ETH-VMWARE.png" alt="Featured image of post Utilizing USB to Eth for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>I stumbled upon a collection of affordable Dell Optiplex 7060 Micros, equipped with exceptional specs for a homelab cluster ESXi environment. However, I faced a challenge in having only one Ethernet interface on each host, when I needed dedicated ISCSI storage on a separate interface. I found a solution using custom drivers for specific USB to Ethernet adapters, supported unofficially by VMware staff.&lt;/p>
-&lt;h2 id="choosing-the-adapters">Choosing the Adapters&lt;/h2>
-&lt;p>Make sure to select a USB to Ethernet adapter that&amp;rsquo;s compatible. See a list of &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#requirements" target="_blank" rel="noopener"
->officially unsupported but working adapters on VMware&amp;rsquo;s site&lt;/a>, or choose the one I used &lt;a class="link" href="https://www.amazon.com/dp/B00YUU3KC6?psc=1&amp;amp;ref=ppx_yo2ov_dt_b_product_details" target="_blank" rel="noopener"
->from Amazon&lt;/a>.&lt;/p>
-&lt;ul>
-&lt;li>The adapter I chose, is a TP-Link E300, with a Realtek RTL8153 chip, that supports 10/100/1000MB speeds.&lt;/li>
-&lt;/ul>
-&lt;h2 id="physical-and-ssh-access">Physical and SSH Access&lt;/h2>
-&lt;p>You&amp;rsquo;ll need physical access to install the adapters and connect them to the network (either directly to the ISCSI interface or through a dedicated VLAN). On the ESXi host(s), go to &lt;a class="link" href="https://ip.address:443" target="_blank" rel="noopener"
->https://ip.address:443&lt;/a> to enable SSH if needed.&lt;/p>
-&lt;h2 id="installing-the-vmware-driver">Installing the VMware Driver&lt;/h2>
-&lt;ul>
-&lt;li>
-&lt;p>Download the driver from &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#summary" target="_blank" rel="noopener"
->VMware&lt;/a>. Ensure the correct version based on the ESXi hosts.&lt;/p>
-&lt;ul>
-&lt;li>Do a quick check on the host with &lt;code>vmware -v&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>Transfer it to the host(s) and install:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">scp /file/location &amp;lt;user&amp;gt;@&amp;lt;ip-esxi-host&amp;gt;:/location/to/put/file
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ssh &amp;lt;user&amp;gt;@&amp;lt;ip&amp;gt;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">esxcli software component apply -d /path/to/the component zip
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">reboot
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="configuring-usb-to-ethernet-usage">Configuring USB to Ethernet Usage&lt;/h2>
-&lt;ul>
-&lt;li>
-&lt;p>After rebooting, create a new NIC on the ESXi host or in vSphere.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Confirm proper configuration within the GUI, then run within the SSH console:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">esxcli system module parameters &lt;span class="nb">set&lt;/span> -p &lt;span class="s2">&amp;#34;usbBusFullScanOnBootEnabled=1&amp;#34;&lt;/span> -m vmkusb_nic_fling
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;li>
-&lt;p>Edit the local.sh file:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vi /etc/rc.local.d/local.sh
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>Add this snippet:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">vusb0_status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>esxcli network nic get -n vusb0 &lt;span class="p">|&lt;/span> grep &lt;span class="s1">&amp;#39;Link Status&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{print $NF}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">0&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="o">[[&lt;/span> &lt;span class="nv">$count&lt;/span> -lt &lt;span class="m">20&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">vusb0_status&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> !&lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;Up&amp;#34;&lt;/span> &lt;span class="o">]]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">do&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sleep &lt;span class="m">10&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$((&lt;/span> &lt;span class="nv">$count&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="k">))&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">vusb0_status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>esxcli network nic get -n vusb0 &lt;span class="p">|&lt;/span> grep &lt;span class="s1">&amp;#39;Link Status&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{print $NF}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">done&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">esxcfg-vswitch -R
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;li>
-&lt;p>Add the provided code, and if you need support for multiple adapters, see more details &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#instructions" target="_blank" rel="noopener"
->here&lt;/a>.&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="conclusion">Conclusion&lt;/h2>
-&lt;p>Verify the network connectivity, and you&amp;rsquo;ll now have a dedicated management port and an additional ISCSI NAS port for HA failover. Additionally, if you are like me, an affordable solution created to creating additional network interfaces on a Dell Optiplex 7060 Micro!&lt;/p></description></item><item><title>Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post Migrating Proxmox Raw LVM to VMDK for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Converting a Proxmox virtual machine to a vmdk for VMWare. In this, I will be doing so with virtual machines in LVM Raw format in Proxmox, into VMDKs for transfer from the Proxmox Hyper-viser to a ESXI hyper-viser.&lt;/p>
-&lt;h2 id="find-critical-data-of-proxmox-vm">Find critical data of Proxmox VM&lt;/h2>
-&lt;p>First within Proxmox, navigate to the VM in question, and see its location, and data type. Assuming it may be a LVM. Ensure you write down the total CPU count and RAM usage, as it should mirror it on first startup in VMWare. Otherwise it may corrupt.&lt;/p>
-&lt;ul>
-&lt;li>Gather data for VM in question:
-&lt;ul>
-&lt;li>&lt;code>qm status &amp;lt;vmid&amp;gt;&lt;/code>&lt;/li>
-&lt;li>&lt;code>qm config &amp;lt;vmid&amp;gt;&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Find pathing:
-&lt;ul>
-&lt;li>&lt;code>pvesm path &amp;lt;storage-identifier&amp;gt;:&amp;lt;disk&amp;gt;&lt;/code>&lt;/li>
-&lt;li>&lt;code>lvdisplay /dev/&amp;lt;storage&amp;gt;/vm-&amp;lt;vmid&amp;gt;-disk-0&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>If you cannot find it, I have noticed Proxmox likes to deactivate LVMs once the VM is offline. You can change this by running &lt;code>lvscan&lt;/code>, and then running &lt;code>lvchange --activate /dev/&amp;lt;storage-pool&amp;gt;/&amp;lt;Disk-ID&amp;gt;&lt;/code>&lt;/em>&lt;/p>
-&lt;h2 id="convert-disk-from-lvm-to-vmdk">Convert disk from LVM to VMDK&lt;/h2>
-&lt;ul>
-&lt;li>Once disk is found, convert it to a vmdk
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qemu-img convert -f raw /dev/storage/vm-&amp;lt;vmid&amp;gt;-disk-0 -O vmdk &amp;lt;name-of-vmdk-file-to-create&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="move-the-disk">Move the disk&lt;/h2>
-&lt;ul>
-&lt;li>Copy disk over to your VMWare host (Or specified storage location)
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">scp &amp;lt;disk-location&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;ip/fqdn&amp;gt;:&amp;lt;destination-file&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="clone-to-a-thin-provision">Clone to a thin provision&lt;/h2>
-&lt;p>I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="create-virtual-machine-in-vcenter">Create Virtual Machine in vCenter&lt;/h2>
-&lt;p>In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)&lt;/p>
-&lt;p>Again, ensure your RAM/CPU configuration matches that of the Proxmox configuration.&lt;/p>
-&lt;p>If it fails, just try again, its easy to miss one step and have an issue here.&lt;/p></description></item><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted -->
-To complete this project, 3 steps are taken.&lt;/p>
-&lt;ol>
-&lt;li>Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt&lt;/li>
-&lt;li>Use Terraform to deploy 4 virtual machines into a vSphere environment&lt;/li>
-&lt;li>Use Ansible to configure these 4 virtual machines as desired&lt;/li>
-&lt;/ol>
-&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/vSphere/vSphere-WinServ-Deployment" target="_blank" rel="noopener"
->GitHub (vSphere-WinServ-Deployment)&lt;/a> at the repository!&lt;/strong>&lt;/p>
-&lt;h2 id="1-packers-role">1. Packer&amp;rsquo;s Role:&lt;/h2>
-&lt;p>Create a Windows Server 2022 .iso that is updated and has VMTools installed by default using &lt;a class="link" href="https://www.packer.io/" target="_blank" rel="noopener"
->Packer&lt;/a>. In this solution, it will be geared to usage with vSphere, a VMware product.&lt;/p>
-&lt;p>&lt;strong>First: Packer uses &lt;code>autounattend.xml&lt;/code> and &lt;code>sysprep-autounattend.xml&lt;/code> to automate Windows Settings&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>It pulls Windows Server 2022 Datacenter Eval Edition (Desktop Experience) from Microsoft&amp;rsquo;s site&lt;/li>
-&lt;li>Installs &amp;amp; configure OpenSSH Client &amp;amp; Server for remote connection&lt;/li>
-&lt;li>Installs VMware tools from ISO provided from the build ESX server&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>Packer Provisioner Steps&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>Updating OS via Windows Update&lt;/li>
-&lt;li>Doing some OS adjustments
-&lt;ul>
-&lt;li>Set Windows telemetry settings to minimum&lt;/li>
-&lt;li>Show file extentions by default&lt;/li>
-&lt;li>Install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
->Chocolatey&lt;/a> - a Windows package manager
-&lt;ul>
-&lt;li>Install Microsoft Edge (Chromium)&lt;/li>
-&lt;li>Install Win32-OpenSSH-Server&lt;/li>
-&lt;li>Install PowerShell Core&lt;/li>
-&lt;li>Install 7-Zip&lt;/li>
-&lt;li>Install Notepad++&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Enable Powershell-Core (&lt;code>pwsh&lt;/code>) to be the default SSHD shell&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Cleanup tasks&lt;/li>
-&lt;li>Remove CDROM drives from VM template (otherwise there would be 2)&lt;/li>
-&lt;/ul>
-&lt;h2 id="2-terraforms-role">2. Terraform&amp;rsquo;s Role:&lt;/h2>
-&lt;p>Main role: Deploy the Virtual Machines&lt;/p>
-&lt;ul>
-&lt;li>Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare)
-&lt;ul>
-&lt;li>Using the vSphere provider:
-&lt;ul>
-&lt;li>Assign appropriate resources to each machine&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Once prepared with appropriate values and the networking is in place:
-&lt;ul>
-&lt;li>Navigate to the Terraform directory and run these commands&lt;/li>
-&lt;li>&lt;code>terraform init&lt;/code> Pull proper Terraform providers and modules used&lt;/li>
-&lt;li>&lt;code>terraform validate&lt;/code> This will return whether the configuration is valid or not&lt;/li>
-&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code> Actually apply the configuration&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="terraform-variable-files">Terraform Variable files&lt;/h2>
-&lt;ul>
-&lt;li>&lt;em>variables.tf&lt;/em>
-&lt;ul>
-&lt;li>Declare variables that will be used with the Terraform configuration&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>terraform.tfvars&lt;/em>
-&lt;ul>
-&lt;li>Assign variables that will be used with the Terraform configuration&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="3-ansibles-role">3. Ansible&amp;rsquo;s Role:&lt;/h2>
-&lt;p>Main role: Configure the deployed Virtual Machines.&lt;/p>
-&lt;ul>
-&lt;li>Setup Windows Server Feature: Domain
-&lt;ul>
-&lt;li>Primary Domain Controller&lt;/li>
-&lt;li>Replica Domain Controller&lt;/li>
-&lt;li>Auto-Join the Virutal Machines to the respective Domain created&lt;/li>
-&lt;li>Create a few users and groups within Active Directory&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Setup Windows Ssrver Feature: DHCP
-&lt;ul>
-&lt;li>Setup DHCP Scope&lt;/li>
-&lt;li>Authorize it to the Domain.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Setup Windows Server Feature: File Sharing
-&lt;ul>
-&lt;li>Create two shares
-&lt;ul>
-&lt;li>An employee share and administrator share. These shares are assigned group permissions.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Common Configurations
-&lt;ul>
-&lt;li>Enable RDP and allow it through the firewall on all windows servers created&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="ansible-variable-files">Ansible Variable files&lt;/h2>
-&lt;ul>
-&lt;li>&lt;em>inventory.yml&lt;/em>
-&lt;ul>
-&lt;li>Modify hosts associated with the playbook. Assign the IP addressing.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>winlab.yml&lt;/em>
-&lt;ul>
-&lt;li>Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li>
-&lt;li>These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>ansible.cfg&lt;/em>
-&lt;ul>
-&lt;li>Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>./group_vars/all.yml&lt;/em>
-&lt;ul>
-&lt;li>Contains specific variable information used within the ./roles/* Ansible code.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="prerequisites">Prerequisites&lt;/h1>
-&lt;ul>
-&lt;li>Linux machine with the following
-&lt;ul>
-&lt;li>Ansible
-&lt;ul>
-&lt;li>&lt;code>sudo apt update&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt install software-properties-common&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo add-apt-repository --yes --update ppa:ansible/ansible&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt install ansible&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Terraform
-&lt;ul>
-&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install -y gnupg software-properties-common curl&lt;/code>&lt;/li>
-&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install terraform&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Packer
-&lt;ul>
-&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install packer&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Git
-&lt;ul>
-&lt;li>&lt;code>sudo apt-get install git&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>A Code Interprester
-&lt;ul>
-&lt;li>I recommend &lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
->Visual-Studio-Code&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>vSphere Lab Environment
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://www.vmware.com/products/vsphere.html" target="_blank" rel="noopener"
->vSphere&lt;/a> &amp;mdash; &lt;em>Note: This project is using vSphere version 7.0.0&lt;/em>
-&lt;!-- raw HTML omitted -->&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="packer">Packer&lt;/h1>
-&lt;h2 id="navigate-to-packer-directory">Navigate to Packer Directory&lt;/h2>
-&lt;ul>
-&lt;li>First setup Packer environment
-&lt;ul>
-&lt;li>&lt;code>packer init -upgrade ws2022.pkr.hcl&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Then apply the Packer configuration to create the Windows Server 2022 Image
-&lt;ul>
-&lt;li>&lt;code>packer build -timestamp-ui -force -var-file=myvarfile.json ws2022.pkr.hcl&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;ul>
-&lt;li>This packer execute pulls the newest windows server datacenter 2022 eval .iso from microsoft populates it into the vSphere environment, in the specified datacenter/cluster/host/datastore&lt;/li>
-&lt;li>It then runs commands to: Grab DHCP, Updates the image, Enables SSH, Enables RDP, Configures necessary firewall settings, sets passwords/usernames, &amp;amp; installs VMware Tools to base image&lt;/li>
-&lt;li>Additionally, it will install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
->Chocolatey&lt;/a> for packages, notepad++, Edge, &amp;amp; 7-zip
-&lt;!-- raw HTML omitted -->&lt;/li>
-&lt;/ul>
-&lt;h2 id="after-packer-finishes">After Packer Finishes&lt;/h2>
-&lt;h6 id="roughly-an-hour-depending-on-processing-and-internet-speed">&lt;em>Roughly an hour depending on processing and internet speed&lt;/em>&lt;/h6>
-&lt;ul>
-&lt;li>Go into your vSphere and turn the resulting VM into a Template
-&lt;ul>
-&lt;li>Ensure this mimics the variables you have set in the terraform.tfvars file. This will be our next step.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="terraform">Terraform&lt;/h1>
-&lt;h2 id="navigate-to-terraform-directory">Navigate to Terraform Directory&lt;/h2>
-&lt;ul>
-&lt;li>Setup Terraform Environemnt
-&lt;ul>
-&lt;li>&lt;code>terraform init&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Format terraform to ensure it meets criteria required
-&lt;ul>
-&lt;li>&lt;code>terraform fmt&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Do a terraform plan to detect any potential errors in code and to see potential end result. Read over this
-&lt;ul>
-&lt;li>&lt;code>terraform plan&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Finally, if all the above appears correct, perform a terraform apply
-&lt;ul>
-&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code>
-&lt;ul>
-&lt;li>This may take awhile, once it is done, double check in vSphere all necessary Virtual Machines were created properly &lt;em>(For me this took 20 minutes to fully complete)&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="ansible">Ansible&lt;/h1>
-&lt;h2 id="navigate-to-ansible-directory">Navigate to Ansible Directory&lt;/h2>
-&lt;ul>
-&lt;li>Once you have allowed Terraform to finish its configuraiton:
-&lt;ul>
-&lt;li>Navigate to your Ansible Directory, &lt;code>cd &amp;lt;path-to-Ansible&amp;gt;&lt;/code>&lt;/li>
-&lt;li>Run your ansible playbook &lt;code>ansible-playbook winlab.yml&lt;/code>
-&lt;ul>
-&lt;li>This should run through and detail each change as it plays out&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="references-useduseful-links">References Used/Useful Links&lt;/h1>
-&lt;h3 id="i-sourced-various-code-and-peices-of-information-from-the-following-git-repositories">I sourced various code and peices of information from the following Git Repositories&lt;/h3>
-&lt;ul>
-&lt;li>Stefan Zimmermann &lt;a class="link" href="https://gitlab.com/StefanZ8n/packer-ws2022" target="_blank" rel="noopener"
->GitLab&lt;/a> &lt;a class="link" href="https://z8n.eu/2021/11/09/building-a-windows-server-2022-ova-with-packer/" target="_blank" rel="noopener"
->Article&lt;/a>&lt;/li>
-&lt;li>Dmitry Teslya &lt;a class="link" href="https://github.com/dteslya/win-iac-lab" target="_blank" rel="noopener"
->GitHub&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h3 id="useful-places-for-refernece">Useful places for refernece&lt;/h3>
-&lt;ul>
-&lt;li>Tutorials for Terraform, Packer, and others &lt;a class="link" href="https://learn.hashicorp.com/search?query=Packer" target="_blank" rel="noopener"
->Hashicorp-Tutorials&lt;/a>&lt;/li>
-&lt;li>Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
->Documentation&lt;/a>
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
->Windows-Modules&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
->Documentation&lt;/a>&lt;/li>
-&lt;li>Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
->Documentation&lt;/a>&lt;/li>
-&lt;/ul></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMWare on Cinderblock</title><link>https://cinderblock.github.io/categories/vmware/</link><description>Recent content in VMWare on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 04 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>Utilizing USB to Eth for VMWare</title><link>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</link><pubDate>Fri, 04 Aug 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/USB-to-ETH-VMWARE.png" alt="Featured image of post Utilizing USB to Eth for VMWare" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;I stumbled upon a collection of affordable Dell Optiplex 7060 Micros, equipped with exceptional specs for a homelab cluster ESXi environment. However, I faced a challenge in having only one Ethernet interface on each host, when I needed dedicated ISCSI storage on a separate interface. I found a solution using custom drivers for specific USB to Ethernet adapters, supported unofficially by VMware staff.&lt;/p&gt;
+&lt;h2 id="choosing-the-adapters"&gt;Choosing the Adapters&lt;/h2&gt;
+&lt;p&gt;Make sure to select a USB to Ethernet adapter that&amp;rsquo;s compatible. See a list of &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#requirements" target="_blank" rel="noopener"
+&gt;officially unsupported but working adapters on VMware&amp;rsquo;s site&lt;/a&gt;, or choose the one I used &lt;a class="link" href="https://www.amazon.com/dp/B00YUU3KC6?psc=1&amp;amp;ref=ppx_yo2ov_dt_b_product_details" target="_blank" rel="noopener"
+&gt;from Amazon&lt;/a&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The adapter I chose, is a TP-Link E300, with a Realtek RTL8153 chip, that supports 10/100/1000MB speeds.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="physical-and-ssh-access"&gt;Physical and SSH Access&lt;/h2&gt;
+&lt;p&gt;You&amp;rsquo;ll need physical access to install the adapters and connect them to the network (either directly to the ISCSI interface or through a dedicated VLAN). On the ESXi host(s), go to &lt;a class="link" href="https://ip.address:443" target="_blank" rel="noopener"
+&gt;https://ip.address:443&lt;/a&gt; to enable SSH if needed.&lt;/p&gt;
+&lt;h2 id="installing-the-vmware-driver"&gt;Installing the VMware Driver&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Download the driver from &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#summary" target="_blank" rel="noopener"
+&gt;VMware&lt;/a&gt;. Ensure the correct version based on the ESXi hosts.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Do a quick check on the host with &lt;code&gt;vmware -v&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Transfer it to the host(s) and install:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;scp /file/location &amp;lt;user&amp;gt;@&amp;lt;ip-esxi-host&amp;gt;:/location/to/put/file
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh &amp;lt;user&amp;gt;@&amp;lt;ip&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;esxcli software component apply -d /path/to/the component zip
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reboot
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="configuring-usb-to-ethernet-usage"&gt;Configuring USB to Ethernet Usage&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;After rebooting, create a new NIC on the ESXi host or in vSphere.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Confirm proper configuration within the GUI, then run within the SSH console:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;esxcli system module parameters &lt;span class="nb"&gt;set&lt;/span&gt; -p &lt;span class="s2"&gt;&amp;#34;usbBusFullScanOnBootEnabled=1&amp;#34;&lt;/span&gt; -m vmkusb_nic_fling
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Edit the local.sh file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vi /etc/rc.local.d/local.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Add this snippet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;vusb0_status&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;esxcli network nic get -n vusb0 &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;Link Status&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{print $NF}&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$count&lt;/span&gt; -lt &lt;span class="m"&gt;20&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;vusb0_status&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;Up&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; sleep &lt;span class="m"&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt; &lt;span class="nv"&gt;$count&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="k"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nv"&gt;vusb0_status&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;esxcli network nic get -n vusb0 &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;Link Status&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{print $NF}&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;esxcfg-vswitch -R
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add the provided code, and if you need support for multiple adapters, see more details &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#instructions" target="_blank" rel="noopener"
+&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="conclusion"&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Verify the network connectivity, and you&amp;rsquo;ll now have a dedicated management port and an additional ISCSI NAS port for HA failover. Additionally, if you are like me, an affordable solution created to creating additional network interfaces on a Dell Optiplex 7060 Micro!&lt;/p&gt;</description></item><item><title>Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post Migrating Proxmox Raw LVM to VMDK for VMWare" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Converting a Proxmox virtual machine to a vmdk for VMWare. In this, I will be doing so with virtual machines in LVM Raw format in Proxmox, into VMDKs for transfer from the Proxmox Hyper-viser to a ESXI hyper-viser.&lt;/p&gt;
+&lt;h2 id="find-critical-data-of-proxmox-vm"&gt;Find critical data of Proxmox VM&lt;/h2&gt;
+&lt;p&gt;First within Proxmox, navigate to the VM in question, and see its location, and data type. Assuming it may be a LVM. Ensure you write down the total CPU count and RAM usage, as it should mirror it on first startup in VMWare. Otherwise it may corrupt.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Gather data for VM in question:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;qm status &amp;lt;vmid&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;qm config &amp;lt;vmid&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Find pathing:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;pvesm path &amp;lt;storage-identifier&amp;gt;:&amp;lt;disk&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lvdisplay /dev/&amp;lt;storage&amp;gt;/vm-&amp;lt;vmid&amp;gt;-disk-0&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;If you cannot find it, I have noticed Proxmox likes to deactivate LVMs once the VM is offline. You can change this by running &lt;code&gt;lvscan&lt;/code&gt;, and then running &lt;code&gt;lvchange --activate /dev/&amp;lt;storage-pool&amp;gt;/&amp;lt;Disk-ID&amp;gt;&lt;/code&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id="convert-disk-from-lvm-to-vmdk"&gt;Convert disk from LVM to VMDK&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Once disk is found, convert it to a vmdk
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;qemu-img convert -f raw /dev/storage/vm-&amp;lt;vmid&amp;gt;-disk-0 -O vmdk &amp;lt;name-of-vmdk-file-to-create&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="move-the-disk"&gt;Move the disk&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Copy disk over to your VMWare host (Or specified storage location)
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;scp &amp;lt;disk-location&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;ip/fqdn&amp;gt;:&amp;lt;destination-file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="clone-to-a-thin-provision"&gt;Clone to a thin provision&lt;/h2&gt;
+&lt;p&gt;I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="create-virtual-machine-in-vcenter"&gt;Create Virtual Machine in vCenter&lt;/h2&gt;
+&lt;p&gt;In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)&lt;/p&gt;
+&lt;p&gt;Again, ensure your RAM/CPU configuration matches that of the Proxmox configuration.&lt;/p&gt;
+&lt;p&gt;If it fails, just try again, its easy to miss one step and have an issue here.&lt;/p&gt;</description></item><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted --&gt;
+To complete this project, 3 steps are taken.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt&lt;/li&gt;
+&lt;li&gt;Use Terraform to deploy 4 virtual machines into a vSphere environment&lt;/li&gt;
+&lt;li&gt;Use Ansible to configure these 4 virtual machines as desired&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/vSphere/vSphere-WinServ-Deployment" target="_blank" rel="noopener"
+&gt;GitHub (vSphere-WinServ-Deployment)&lt;/a&gt; at the repository!&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id="1-packers-role"&gt;1. Packer&amp;rsquo;s Role:&lt;/h2&gt;
+&lt;p&gt;Create a Windows Server 2022 .iso that is updated and has VMTools installed by default using &lt;a class="link" href="https://www.packer.io/" target="_blank" rel="noopener"
+&gt;Packer&lt;/a&gt;. In this solution, it will be geared to usage with vSphere, a VMware product.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;First: Packer uses &lt;code&gt;autounattend.xml&lt;/code&gt; and &lt;code&gt;sysprep-autounattend.xml&lt;/code&gt; to automate Windows Settings&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It pulls Windows Server 2022 Datacenter Eval Edition (Desktop Experience) from Microsoft&amp;rsquo;s site&lt;/li&gt;
+&lt;li&gt;Installs &amp;amp; configure OpenSSH Client &amp;amp; Server for remote connection&lt;/li&gt;
+&lt;li&gt;Installs VMware tools from ISO provided from the build ESX server&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Packer Provisioner Steps&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Updating OS via Windows Update&lt;/li&gt;
+&lt;li&gt;Doing some OS adjustments
+&lt;ul&gt;
+&lt;li&gt;Set Windows telemetry settings to minimum&lt;/li&gt;
+&lt;li&gt;Show file extentions by default&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+&gt;Chocolatey&lt;/a&gt; - a Windows package manager
+&lt;ul&gt;
+&lt;li&gt;Install Microsoft Edge (Chromium)&lt;/li&gt;
+&lt;li&gt;Install Win32-OpenSSH-Server&lt;/li&gt;
+&lt;li&gt;Install PowerShell Core&lt;/li&gt;
+&lt;li&gt;Install 7-Zip&lt;/li&gt;
+&lt;li&gt;Install Notepad++&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Enable Powershell-Core (&lt;code&gt;pwsh&lt;/code&gt;) to be the default SSHD shell&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Cleanup tasks&lt;/li&gt;
+&lt;li&gt;Remove CDROM drives from VM template (otherwise there would be 2)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-terraforms-role"&gt;2. Terraform&amp;rsquo;s Role:&lt;/h2&gt;
+&lt;p&gt;Main role: Deploy the Virtual Machines&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare)
+&lt;ul&gt;
+&lt;li&gt;Using the vSphere provider:
+&lt;ul&gt;
+&lt;li&gt;Assign appropriate resources to each machine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Once prepared with appropriate values and the networking is in place:
+&lt;ul&gt;
+&lt;li&gt;Navigate to the Terraform directory and run these commands&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;terraform init&lt;/code&gt; Pull proper Terraform providers and modules used&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;terraform validate&lt;/code&gt; This will return whether the configuration is valid or not&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;terraform apply&lt;/code&gt; &amp;hellip; &lt;code&gt;yes&lt;/code&gt; Actually apply the configuration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="terraform-variable-files"&gt;Terraform Variable files&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;variables.tf&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Declare variables that will be used with the Terraform configuration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;terraform.tfvars&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Assign variables that will be used with the Terraform configuration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-ansibles-role"&gt;3. Ansible&amp;rsquo;s Role:&lt;/h2&gt;
+&lt;p&gt;Main role: Configure the deployed Virtual Machines.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup Windows Server Feature: Domain
+&lt;ul&gt;
+&lt;li&gt;Primary Domain Controller&lt;/li&gt;
+&lt;li&gt;Replica Domain Controller&lt;/li&gt;
+&lt;li&gt;Auto-Join the Virutal Machines to the respective Domain created&lt;/li&gt;
+&lt;li&gt;Create a few users and groups within Active Directory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Setup Windows Ssrver Feature: DHCP
+&lt;ul&gt;
+&lt;li&gt;Setup DHCP Scope&lt;/li&gt;
+&lt;li&gt;Authorize it to the Domain.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Setup Windows Server Feature: File Sharing
+&lt;ul&gt;
+&lt;li&gt;Create two shares
+&lt;ul&gt;
+&lt;li&gt;An employee share and administrator share. These shares are assigned group permissions.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Common Configurations
+&lt;ul&gt;
+&lt;li&gt;Enable RDP and allow it through the firewall on all windows servers created&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="ansible-variable-files"&gt;Ansible Variable files&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;inventory.yml&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Modify hosts associated with the playbook. Assign the IP addressing.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;winlab.yml&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li&gt;
+&lt;li&gt;These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;ansible.cfg&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;./group_vars/all.yml&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Contains specific variable information used within the ./roles/* Ansible code.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="prerequisites"&gt;Prerequisites&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux machine with the following
+&lt;ul&gt;
+&lt;li&gt;Ansible
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo apt update&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt install software-properties-common&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo add-apt-repository --yes --update ppa:ansible/ansible&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt install ansible&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Terraform
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install -y gnupg software-properties-common curl&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install terraform&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Packer
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install packer&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Git
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get install git&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;A Code Interprester
+&lt;ul&gt;
+&lt;li&gt;I recommend &lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
+&gt;Visual-Studio-Code&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;vSphere Lab Environment
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.vmware.com/products/vsphere.html" target="_blank" rel="noopener"
+&gt;vSphere&lt;/a&gt; &amp;mdash; &lt;em&gt;Note: This project is using vSphere version 7.0.0&lt;/em&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="packer"&gt;Packer&lt;/h1&gt;
+&lt;h2 id="navigate-to-packer-directory"&gt;Navigate to Packer Directory&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;First setup Packer environment
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;packer init -upgrade ws2022.pkr.hcl&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Then apply the Packer configuration to create the Windows Server 2022 Image
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;packer build -timestamp-ui -force -var-file=myvarfile.json ws2022.pkr.hcl&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;This packer execute pulls the newest windows server datacenter 2022 eval .iso from microsoft populates it into the vSphere environment, in the specified datacenter/cluster/host/datastore&lt;/li&gt;
+&lt;li&gt;It then runs commands to: Grab DHCP, Updates the image, Enables SSH, Enables RDP, Configures necessary firewall settings, sets passwords/usernames, &amp;amp; installs VMware Tools to base image&lt;/li&gt;
+&lt;li&gt;Additionally, it will install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+&gt;Chocolatey&lt;/a&gt; for packages, notepad++, Edge, &amp;amp; 7-zip
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="after-packer-finishes"&gt;After Packer Finishes&lt;/h2&gt;
+&lt;h6 id="roughly-an-hour-depending-on-processing-and-internet-speed"&gt;&lt;em&gt;Roughly an hour depending on processing and internet speed&lt;/em&gt;&lt;/h6&gt;
+&lt;ul&gt;
+&lt;li&gt;Go into your vSphere and turn the resulting VM into a Template
+&lt;ul&gt;
+&lt;li&gt;Ensure this mimics the variables you have set in the terraform.tfvars file. This will be our next step.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="terraform"&gt;Terraform&lt;/h1&gt;
+&lt;h2 id="navigate-to-terraform-directory"&gt;Navigate to Terraform Directory&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup Terraform Environemnt
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform init&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Format terraform to ensure it meets criteria required
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform fmt&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Do a terraform plan to detect any potential errors in code and to see potential end result. Read over this
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform plan&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Finally, if all the above appears correct, perform a terraform apply
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform apply&lt;/code&gt; &amp;hellip; &lt;code&gt;yes&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;This may take awhile, once it is done, double check in vSphere all necessary Virtual Machines were created properly &lt;em&gt;(For me this took 20 minutes to fully complete)&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="ansible"&gt;Ansible&lt;/h1&gt;
+&lt;h2 id="navigate-to-ansible-directory"&gt;Navigate to Ansible Directory&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Once you have allowed Terraform to finish its configuraiton:
+&lt;ul&gt;
+&lt;li&gt;Navigate to your Ansible Directory, &lt;code&gt;cd &amp;lt;path-to-Ansible&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Run your ansible playbook &lt;code&gt;ansible-playbook winlab.yml&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;This should run through and detail each change as it plays out&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="references-useduseful-links"&gt;References Used/Useful Links&lt;/h1&gt;
+&lt;h3 id="i-sourced-various-code-and-peices-of-information-from-the-following-git-repositories"&gt;I sourced various code and peices of information from the following Git Repositories&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Stefan Zimmermann &lt;a class="link" href="https://gitlab.com/StefanZ8n/packer-ws2022" target="_blank" rel="noopener"
+&gt;GitLab&lt;/a&gt; &lt;a class="link" href="https://z8n.eu/2021/11/09/building-a-windows-server-2022-ova-with-packer/" target="_blank" rel="noopener"
+&gt;Article&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Dmitry Teslya &lt;a class="link" href="https://github.com/dteslya/win-iac-lab" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="useful-places-for-refernece"&gt;Useful places for refernece&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Tutorials for Terraform, Packer, and others &lt;a class="link" href="https://learn.hashicorp.com/search?query=Packer" target="_blank" rel="noopener"
+&gt;Hashicorp-Tutorials&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
+&gt;Windows-Modules&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

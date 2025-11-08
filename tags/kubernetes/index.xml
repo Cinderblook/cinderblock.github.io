@@ -1,880 +1,880 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>kubernetes on Cinderblock</title><link>https://cinderblock.github.io/tags/kubernetes/</link><description>Recent content in kubernetes on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 04 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Terraform - Azure Kubernetes Deployment</title><link>https://cinderblock.github.io/p/terraform-azure-kubernetes-deployment/</link><pubDate>Mon, 04 Apr 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-azure-kubernetes-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-azure-kubernetes-deployment/Terraform-DeployingKubernetesAKS.png" alt="Featured image of post Terraform - Azure Kubernetes Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Deplying a Kubernetes Cluster in Azure with the AKS service.&lt;/p>
-&lt;ul>
-&lt;li>Build a Kubernetes cluster in Azure&lt;/li>
-&lt;li>Have the cluster setup to automatically scale with load&lt;/li>
-&lt;li>Have Kubeconfig file available so it can be managed, changed, altered, destroyed, etc.&lt;/li>
-&lt;li>Ensure Kubeconfig file is secure, and is being encrypted with traffic involved in this&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/Azure/Azure-K8S-Deploy" target="_blank" rel="noopener"
->GitHub (Azure-K8S-Deploy)&lt;/a> at the repository!&lt;/strong>&lt;/p>
-&lt;h1 id="steps-to-do-this">Steps to do this&lt;/h1>
-&lt;ol>
-&lt;li>Have an Azure account; &lt;em>if you are a student, sign up for a student account and get some free credits along side it.&lt;/em>&lt;/li>
-&lt;li>Setup Terraform files for the deployment&lt;/li>
-&lt;li>Keep track of Terraform State and Kubeconfig files in order to continue managaing deployed resources&lt;/li>
-&lt;/ol>
-&lt;h1 id="terraform-process">Terraform Process&lt;/h1>
-&lt;h2 id="setting-up-providers-azurerm--kubernetes">Setting up Providers; Azurerm &amp;amp; Kubernetes&lt;/h2>
-&lt;p>Create a file named provider.tf &lt;!-- raw HTML omitted --> I personally use the Azure CLI, this guide will be based on that. Use &lt;code>az login&lt;/code> to connect to your Azure resources. Refer to &lt;a class="link" href="https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli" target="_blank" rel="noopener"
->Microsoft&amp;rsquo;s documentation for Azure CLI&lt;/a>. For Terraform, we are using the &lt;a class="link" href="https://registry.terraform.io/browse/providers" target="_blank" rel="noopener"
->Azurerm, and Kubernetes Poviders&lt;/a>&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">terraform&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">required_providers&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">azurerm&lt;/span> = &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">source&lt;/span> = &lt;span class="s2">&amp;#34;hashicorp/azurerm&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">version&lt;/span> = &lt;span class="s2">&amp;#34;3.0.2&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">provider&lt;/span> &lt;span class="s2">&amp;#34;azurerm&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">features&lt;/span> &lt;span class="p">{}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">provider&lt;/span> &lt;span class="s2">&amp;#34;kubernetes&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">host&lt;/span> = &lt;span class="nb">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">credneitals&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">host&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">client_certificate&lt;/span> =&lt;span class="nb"> base64decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">credneitals&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">client_certificate&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">client_key&lt;/span> =&lt;span class="nb"> base64decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">credneitals&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">client_key&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">cluster_ca_certificate&lt;/span> =&lt;span class="nb"> base64decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">credneitals&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster_ca_certificate&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="setting-up-the-kubernetes-structure">Setting up the Kubernetes structure&lt;/h2>
-&lt;p>Create a file nameed cluster.tf. &lt;!-- raw HTML omitted --> Within this file, we will define required networking and cluster resources/data parameters.&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;span class="lnt">34
-&lt;/span>&lt;span class="lnt">35
-&lt;/span>&lt;span class="lnt">36
-&lt;/span>&lt;span class="lnt">37
-&lt;/span>&lt;span class="lnt">38
-&lt;/span>&lt;span class="lnt">39
-&lt;/span>&lt;span class="lnt">40
-&lt;/span>&lt;span class="lnt">41
-&lt;/span>&lt;span class="lnt">42
-&lt;/span>&lt;span class="lnt">43
-&lt;/span>&lt;span class="lnt">44
-&lt;/span>&lt;span class="lnt">45
-&lt;/span>&lt;span class="lnt">46
-&lt;/span>&lt;span class="lnt">47
-&lt;/span>&lt;span class="lnt">48
-&lt;/span>&lt;span class="lnt">49
-&lt;/span>&lt;span class="lnt">50
-&lt;/span>&lt;span class="lnt">51
-&lt;/span>&lt;span class="lnt">52
-&lt;/span>&lt;span class="lnt">53
-&lt;/span>&lt;span class="lnt">54
-&lt;/span>&lt;span class="lnt">55
-&lt;/span>&lt;span class="lnt">56
-&lt;/span>&lt;span class="lnt">57
-&lt;/span>&lt;span class="lnt">58
-&lt;/span>&lt;span class="lnt">59
-&lt;/span>&lt;span class="lnt">60
-&lt;/span>&lt;span class="lnt">61
-&lt;/span>&lt;span class="lnt">62
-&lt;/span>&lt;span class="lnt">63
-&lt;/span>&lt;span class="lnt">64
-&lt;/span>&lt;span class="lnt">65
-&lt;/span>&lt;span class="lnt">66
-&lt;/span>&lt;span class="lnt">67
-&lt;/span>&lt;span class="lnt">68
-&lt;/span>&lt;span class="lnt">69
-&lt;/span>&lt;span class="lnt">70
-&lt;/span>&lt;span class="lnt">71
-&lt;/span>&lt;span class="lnt">72
-&lt;/span>&lt;span class="lnt">73
-&lt;/span>&lt;span class="lnt">74
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Resource Group for Terraform deployment
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_resource_group&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;cluster&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">prefix&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">-cluster&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">region&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Networking Setup for Cluster
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_virtual_network&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;cluster&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">prefix&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">-network&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">address_space&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;10.1.0.0/16&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_subnet&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;cluster&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">prefix&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">-subnet&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">virtual_network_name&lt;/span> = &lt;span class="nx">azurerm_virtual_network&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">address_prefixes&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;10.1.0.0/24&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;azurerm_kubernetes_cluster&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;cluster&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">prefix&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">-aks&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">location&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">dns_prefix&lt;/span> = &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">prefix&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">-aks&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">linux_profile&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">admin_username&lt;/span> = &lt;span class="s2">&amp;#34;ubuntu&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ssh_key&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">key_data&lt;/span> = &lt;span class="nb">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ssh_public_key&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">default_node_pool&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="s2">&amp;#34;agentpool&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">node_count&lt;/span> = &lt;span class="nb">var&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster_nodes_count&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">vm_size&lt;/span> = &lt;span class="s2">&amp;#34;Standard_B2s&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">type&lt;/span> = &lt;span class="s2">&amp;#34;VirtualMachineScaleSets&amp;#34;&lt;/span>&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> #availability_zones = [&amp;#34;1&amp;#34;, &amp;#34;2&amp;#34;]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="na">enable_auto_scaling&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">min_count&lt;/span> = &lt;span class="m">1&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">max_count&lt;/span> = &lt;span class="m">3&lt;/span>&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # Required for advanced networking
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="na">vnet_subnet_id&lt;/span> = &lt;span class="nx">azurerm_subnet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">identity&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">type&lt;/span> = &lt;span class="s2">&amp;#34;SystemAssigned&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">network_profile&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">network_plugin&lt;/span> = &lt;span class="s2">&amp;#34;kubenet&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">load_balancer_sku&lt;/span> = &lt;span class="s2">&amp;#34;standard&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">tags&lt;/span> = &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">Environment&lt;/span> = &lt;span class="s2">&amp;#34;Development&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Required to be pushed into Kubernetes Provid`er in provider.tf
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">data&lt;/span> &lt;span class="s2">&amp;#34;azurerm_kubernetes_cluster&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;credneitals&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">name&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">resource_group_name&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># This will bring down the required kubeconfig locally to your machine
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">resource&lt;/span> &lt;span class="s2">&amp;#34;local_file&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;kubeconfig&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">depends_on&lt;/span> = &lt;span class="p">[&lt;/span>&lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">filename&lt;/span> = &lt;span class="s2">&amp;#34;./kubeconfig&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">content&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config_raw&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="assigning-variables-for-terraform">Assigning variables for Terraform&lt;/h2>
-&lt;p>Create a file named variables.tf. &lt;!-- raw HTML omitted --> Generally, these variables within the file are ready to go. Ensure the public key is pointing to your SSH key.&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;cluster_name&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">default&lt;/span> = &lt;span class="s2">&amp;#34;terraformclust&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;cluster_nodes_count&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">default&lt;/span> = &lt;span class="s2">&amp;#34;2&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;region&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">default&lt;/span> = &lt;span class="s2">&amp;#34;East US 2&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;prefix&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">default&lt;/span> = &lt;span class="s2">&amp;#34;az-ter&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">variable&lt;/span> &lt;span class="s2">&amp;#34;ssh_public_key&amp;#34;&lt;/span>&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">default&lt;/span> = &lt;span class="s2">&amp;#34;./id_rsa.pub&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="creating-outputs-to-be-sent-back-after-terraform-finishes-running">Creating outputs to be sent back after Terraform finishes running&lt;/h2>
-&lt;p>Create a file named output.tf. &lt;!-- raw HTML omitted --> Certain parts of the output file are critical to get access to the cluster once it is spun up. Specifically the cluster_name, and resource_group_name outputs are essential.These will be used in order to obtain kubectl access for managing the cluster. I included a few extra output resources for future usage.&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;span class="lnt">34
-&lt;/span>&lt;span class="lnt">35
-&lt;/span>&lt;span class="lnt">36
-&lt;/span>&lt;span class="lnt">37
-&lt;/span>&lt;span class="lnt">38
-&lt;/span>&lt;span class="lnt">39
-&lt;/span>&lt;span class="lnt">40
-&lt;/span>&lt;span class="lnt">41
-&lt;/span>&lt;span class="lnt">42
-&lt;/span>&lt;span class="lnt">43
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;client_key&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">client_key&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;client_certificate&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">client_certificate&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;cluster_ca_certificate&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster_ca_certificate&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;cluster_username&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">username&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;cluster_password&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">password&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;kube_config&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config_raw&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;host&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kube_config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">host&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">sensitive&lt;/span> = &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Critical to get kubectl file connected out to Azure for local environment
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;cluster_name&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_kubernetes_cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">output&lt;/span> &lt;span class="s2">&amp;#34;resource_group_name&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">value&lt;/span> = &lt;span class="nx">azurerm_resource_group&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="gain-access-to-kubectl">Gain access to Kubectl&lt;/h2>
-&lt;p>In order to gain access from your local machine, we will use the azure CLI. If you followed the tutorial, you&amp;rsquo;ll already be logged in, &lt;code>az login&lt;/code>. Use the following command to set your environment varialbe for kubectl to control kubernetes cluster in Azure.
-&lt;code>az aks get-credentials --resource-group $(terraform output -raw resource_group_name) --name $(terraform output -raw cluster_name)&lt;/code>&lt;/p>
-&lt;p>Once ran, you can verify it is connected and working with &lt;code>kubectl get nodes&lt;/code> , &lt;code>kubectl get namespace&lt;/code>&lt;/p>
-&lt;h1 id="useful-resources">Useful Resources&lt;/h1>
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://learnk8s.io/terraform-aks" target="_blank" rel="noopener"
->Kubernetes Overview&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://registry.terraform.io/providers/hashicorp/kubernetes/latest" target="_blank" rel="noopener"
->Terraform Kubernetes&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://registry.terraform.io/providers/hashicorp/azurerm/latest" target="_blank" rel="noopener"
->Terraform Azurerm&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>K3S - Highly-Available-Rancher</title><link>https://cinderblock.github.io/p/k3s-highly-available-rancher/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/k3s-highly-available-rancher/</guid><description>&lt;img src="https://cinderblock.github.io/p/k3s-highly-available-rancher/k3sRancher.png" alt="Featured image of post K3S - Highly-Available-Rancher" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Getting started with K3S: &lt;!-- raw HTML omitted -->
-The primary goal here is to setup a functional highly available K3S cluster. This will include 4 necessary steps:&lt;/p>
-&lt;ol>
-&lt;li>Setup NGINX Loadbalancer Docker&lt;/li>
-&lt;li>Setup MySQL Docker&lt;/li>
-&lt;li>Setup Highly Available K3s Cluster&lt;/li>
-&lt;li>(Optional) Setup management from dev machine (Controller)&lt;/li>
-&lt;li>Setup Rancher as a container within the cluster&lt;/li>
-&lt;/ol>
-&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Kubernetes/k3s-HACluster-Rancher" target="_blank" rel="noopener"
->GitHub (k3s-HACluster-Rancher)&lt;/a> at the repository!&lt;/strong>&lt;/p>
-&lt;h1 id="prerequisites">Prerequisites&lt;/h1>
-&lt;ul>
-&lt;li>Have a dedicated Docker host virtual machine, preferrably linux&lt;/li>
-&lt;li>Have 5 Linux virtual machines ready
-&lt;ul>
-&lt;li>Two will be Master Nodes, and Three will be worker nodes. Each will have a dedicated IP address.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>I personally ran all of my linux Virtual Machines as Ubuntu Server 20.04&lt;/p>
-&lt;h1 id="1-setup-nginx-loadbalancer-docker">1. Setup NGINX Loadbalancer Docker&lt;/h1>
-&lt;p>Log into your dedicated docker linux host and create a NGINX Loadbalancer using docker &lt;!-- raw HTML omitted -->
-Ensure docker-compose is installed&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>sudo curl -L &amp;quot;https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)&amp;quot; -o /usr/local/bin/docker-compose&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo chmod +x /usr/local/bin/docker-compose&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;p>After setup, create a directory for nginx, and create a file called docker-compose.yml with the following contents&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;3&amp;#39;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">nginx&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nginx:latest&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">container_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">nginx&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">./nginx.conf:/etc/nginx/nginx.conf&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="m">80&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="m">80&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="m">443&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="m">443&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="m">6443&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="m">6443&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">restart&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">on&lt;/span>-&lt;span class="l">failure&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ul>
-&lt;li>In the same directorty, create a nginx.conf file with the following contet:
-&lt;ul>
-&lt;li>&lt;em>change &amp;lt;IP_MASTER_NODE1 &amp;amp; 2&amp;gt; to your two node IP addresses. Change &amp;lt;IP_NODE_1,2,3&amp;gt; to Worker Node IPs&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;span class="lnt">34
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-conf" data-lang="conf">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">events&lt;/span>&lt;span class="p">{}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">stream&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">upstream&lt;/span> &lt;span class="nv">k3s_servers&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_MASTER_NODE_1&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">6443&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_MASTER_NODE_2&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">6443&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">listen&lt;/span> &lt;span class="nv">6443&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">proxy_pass&lt;/span> &lt;span class="nv">k3s_servers&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">upstream&lt;/span> &lt;span class="nv">rancher_servers_http&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">least_conn&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_1&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">80&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_2&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">80&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_3&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">80&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">listen&lt;/span> &lt;span class="nv">80&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">proxy_pass&lt;/span> &lt;span class="nv">rancher_servers_http&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">upstream&lt;/span> &lt;span class="nv">rancher_servers_https&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">least_conn&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_1&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">443&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_2&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">443&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="err">&amp;lt;&lt;/span>&lt;span class="nv">IP_NODE_3&lt;/span>&lt;span class="err">&amp;gt;:&lt;/span>&lt;span class="nv">443&lt;/span> &lt;span class="nv">max_fails&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">3&lt;/span> &lt;span class="nv">fail_timeout&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">5s&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">server&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">listen&lt;/span> &lt;span class="nv">443&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">proxy_pass&lt;/span> &lt;span class="nv">rancher_servers_https&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ul>
-&lt;li>Commands to setup:
-&lt;ul>
-&lt;li>Change nginx.conf file to match your configuration&lt;/li>
-&lt;li>Enter file directory of nginx and apply &lt;code>sudo docker-compose up -d&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="2-setup-mysql-docker">2. Setup MySQL Docker&lt;/h1>
-&lt;p>On the same dedicated docker host that the nginx loadbalancer is running on:
-Create new directory for mysql and put a docker-compose.yml file in it with the following:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;3.1&amp;#39;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">mysql&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mysql:latest&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">restart&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">always&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">container_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">mysql&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="m">3306&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="m">3306&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">expose&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;3306&amp;#34;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">./mysql-data:/var/lib/mysql/&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">MYSQL_ROOT_PASSWORD=enter-your-password&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>Commands to setup:&lt;/p>
-&lt;ul>
-&lt;li>Enter file directory of mysql and apply &lt;code>sudo docker-compose up -d&lt;/code>&lt;/li>
-&lt;li>Enter the docker to execute commands
-&lt;ul>
-&lt;li>&lt;code>sudo docker exec -it mysql bash&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>mysql -p&lt;/code> &lt;em>(Enter password)&lt;/em>&lt;/li>
-&lt;li>Next, create the database and assign a user to it to be used with the K3s cluster within the mysql bash shell using the following SQL commands.
-&lt;ul>
-&lt;li>&lt;em>Change &amp;lsquo;password&amp;rsquo; and &amp;lsquo;user&amp;rsquo; to your desired variables&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">CREATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">DATABASE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">k3s&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">COLLATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">latin1_swedish_ci&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">CREATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">USER&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">‘&lt;/span>&lt;span class="k">user&lt;/span>&lt;span class="err">’&lt;/span>&lt;span class="o">@&lt;/span>&lt;span class="err">’&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="err">’&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">IDENTIFIED&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">BY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">‘&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="err">’&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">GRANT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">ALL&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">ON&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">k3s&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TO&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;user&amp;#39;&lt;/span>&lt;span class="o">@&lt;/span>&lt;span class="s1">&amp;#39;%&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">FLUSH&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">PRIVILEGES&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;p>To Note: the Database &lt;em>MUST&lt;/em> be &lt;em>latin1_swedish_ci&lt;/em>&lt;/p>
-&lt;h1 id="3-setup-highly-available-k3s-cluster">3. Setup Highly Available K3s Cluster&lt;/h1>
-&lt;p>These will be setup in three steps. The first, setting up the first master node in the K3s cluster. Then, joining an additional master node. Finally, adding the worker nodes.&lt;/p>
-&lt;h2 id="1-primary-master-node-setup">1. Primary Master Node setup&lt;/h2>
-&lt;p>On the first Server node run these commands:&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>export K3S_DATASTORE_ENDPOINT='mysql://user:password@tcp(sqlhost:3306)/database-name&lt;/code>
-&lt;ul>
-&lt;li>&lt;em>Change values to your database values. &amp;lsquo;user&amp;rsquo;, &amp;lsquo;password&amp;rsquo;, &amp;lsquo;sqlhost&amp;rsquo;, &amp;lsquo;database-name&amp;rsquo;&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>curl -sfL https://get.k3s.io | sh -s - server --node-taint CriticalAddonsOnly=true:NoExecute --tls-san 'Load-Balancer-Address'&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;p>After it has connected and you can successfully, check and ensure you can see the node with &lt;code>sudo kubectl get nodes&lt;/code>&lt;/p>
-&lt;ul>
-&lt;li>Obtain node-token from &lt;code>sudo cat /var/lib/rancher/k3s/server/node-token&lt;/code>
-&lt;ul>
-&lt;li>&lt;em>This will be used in the next steps to join the second master node and the workers&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="2-secondary-master-node-setup">2. Secondary Master Node setup&lt;/h2>
-&lt;p>On additional server nodes:&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>export K3S_DATASTORE_ENDPOINT='mysql://user:password@tcp(sqlhost:3306)/database-name&lt;/code>
-&lt;ul>
-&lt;li>&lt;em>Change values to your database values. &amp;lsquo;user&amp;rsquo;, &amp;lsquo;password&amp;rsquo;, &amp;lsquo;sqlhost&amp;rsquo;, &amp;lsquo;database-name&amp;rsquo;&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>Curl -sfL https://get.k3s.io | sh -s - server --node-taint CriticalAddonsOnly=true:NoExecute --tls-san 'Load-Balancer-Address' --token server-token-here sh -&lt;/code>
-&lt;ul>
-&lt;li>&lt;em>Change values to your database values. &amp;lsquo;Load-Balancer-Address&amp;rsquo;, &amp;lsquo;server-token-here&amp;rsquo;&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="3-worker-node-setup">3. Worker Node Setup&lt;/h2>
-&lt;p>On all client agents to be added to cluster&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>export K3S_DATASTORE_ENDPOINT='mysql://user:password@tcp(sqlhost:3306)/database-name'&lt;/code>
-&lt;ul>
-&lt;li>&lt;em>Change values to your database values. &amp;lsquo;user&amp;rsquo;, &amp;lsquo;password&amp;rsquo;, &amp;lsquo;sqlhost&amp;rsquo;, &amp;lsquo;database-name&amp;rsquo;&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>curl -sfL https://get.k3s.io | K3S_URL=https://'Load-Balance-Address':6443 K3S_TOKEN=server-token-here sh -&lt;/code>
-&lt;ul>
-&lt;li>&lt;em>Change values to your database values. &amp;lsquo;Load-Balancer-Address&amp;rsquo;, &amp;lsquo;K3S_TOKEN=server-token-here&amp;rsquo;&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="4-optional-setup-management-from-dev-machine-controller">4. (Optional) Setup management from dev machine (Controller)&lt;/h1>
-&lt;p>Once Cluster has been setup&lt;/p>
-&lt;ul>
-&lt;li>install k3s on controller machine w/ &lt;code>curl -LO &amp;quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&amp;quot;&lt;/code>&lt;/li>
-&lt;li>On a server node run:
-&lt;ul>
-&lt;li>&lt;code>sudo nano /etc/rancher/k3s/k3s.yaml&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Copy contents of that file to a file on your dev machine at location /home/user/.kube/config
-&lt;ul>
-&lt;li>&lt;em>Change IP address in config to match your Load Balancer&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>verify it is working w/ &lt;code>kubectl cluster-info&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;p>You can now control your K3s cluster from another machine, outside of the cluster!&lt;/p>
-&lt;h1 id="5-setup-rancher-as-a-container-within-the-cluster">5. Setup Rancher as a container within the cluster&lt;/h1>
-&lt;p>Deploying Rancher on Workers using Helm &lt;!-- raw HTML omitted -->
-This deployment will be using the self-generated Rancher Certificate. &lt;!-- raw HTML omitted -->
-Either from a Master Node, or the Controller machine (If you followed step 4):&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;p>Add the Helm Chart Repository&lt;/p>
-&lt;ul>
-&lt;li>Install helm
-&lt;ul>
-&lt;li>&lt;code>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3&lt;/code>&lt;/li>
-&lt;li>&lt;code>chmod 700 get_helm.sh&lt;/code>&lt;/li>
-&lt;li>&lt;code>./get_helm.sh&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Use Stable release: &lt;code>helm repo add rancher-stable https://releases.rancher.com/server-charts/stable&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>Create Namespace within K3s for Rancher&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>kubectl create namespace cattle-system&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>Install Cert Manager (Required for self-hosted cert)&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml&lt;/code>&lt;/li>
-&lt;li>&lt;code>helm repo add jetstack https://charts.jetstack.io&lt;/code>&lt;/li>
-&lt;li>&lt;code>helm repo update&lt;/code>&lt;/li>
-&lt;li>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl"> helm install cert-manager jetstack/cert-manager &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --namespace cert-manager &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --create-namespace &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version v1.5.1
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;em>If you experience an issue running this, such as localhost:8080 error, add KUBECONFIG as an environment variable to fix it:&lt;/em> &lt;code>export KUBECONFIG=/etc/rancher/k3s/k3s.yaml&lt;/code>
-&lt;em>If that does not fix it, ensure the .kube config file exists in the proper locaiton&lt;/em> &lt;code>kubectl config view --raw &amp;gt; ~/.kube/config&lt;/code>&lt;/li>
-&lt;li>Verify it is working w/ &lt;code>kubectl get pods --namespace cert-manager&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>Install Rancher using Helm&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"> helm install rancher rancher-stable/rancher \
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --namespace cattle-system \
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --set hostname=port.lan \
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --set replicas=3 \
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --set bootstrapPassword=password
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;li>Check on deployment w/ &lt;code>kubectl -n cattle-system rollout status deploy/rancher&lt;/code>&lt;/li>
-&lt;li>Once finished, obtain info on deployment w/ &lt;code>kubectl -n cattle-system get deploy rancher&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>Once Rancher is deployed&lt;/p>
-&lt;ul>
-&lt;li>Navigate to {LoadBalancer-DNS} site
-&lt;ul>
-&lt;li>&lt;em>It must be the DNS entry of the Load Balancer due to the certification. An IP adddress will NOT work&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Find your secret using command given at site login, and log into the site&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;p>Bam, Rancher installed, and it is now highly available.&lt;/p>
-&lt;h2 id="troubeshooting-rancher">Troubeshooting Rancher&lt;/h2>
-&lt;ul>
-&lt;li>If you must uninstall and reinstall Rancher for any reason, I recommend these steps (They are painful)
-&lt;ul>
-&lt;li>For the name spaces affecting Rancher Directly,&lt;/li>
-&lt;li>&lt;code>sudo kubectl delete namespace namespace-name&lt;/code>&lt;/li>
-&lt;li>Check it w/ &lt;code>kubectl get ns&lt;/code>&lt;/li>
-&lt;li>If stuck in terminating, &lt;code>kubectl edit ns namespace-name&lt;/code>
-&lt;ul>
-&lt;li>Delete everything under the finalizer: fields (Sometimes there are two.)&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="useful-resources--commands">Useful Resources &amp;amp; Commands&lt;/h1>
-&lt;h2 id="useful-docker-commands">Useful Docker Commands&lt;/h2>
-&lt;ul>
-&lt;li>The load balancer and database are setup using Docker-compose
-&lt;ul>
-&lt;li>Useful Docker compose commands:&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Sping up a docker based on docker-compose.yml file&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> docker-compose up -f &lt;span class="s1">&amp;#39;filenamehere&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Sping up a docker and keep it running&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> docker-compose up -d
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Find list of running docker processes&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> docker ps
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Get into shell of a running docker&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> docker &lt;span class="nb">exec&lt;/span> -it &lt;span class="o">[&lt;/span>option&lt;span class="o">]&lt;/span> bash
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Update running docker with new configuration changes&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> docker-compose up -d --force-recreate
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="useful-kubectl-commands">Useful Kubectl Commands&lt;/h2>
-&lt;ul>
-&lt;li>Kubernetes commands (Mostly pulled from &lt;a class="link" href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/" target="_blank" rel="noopener"
->kubectl cheat sheet&lt;/a>)
-&lt;ul>
-&lt;li>Finding ressources&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">Get commands with basic output
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl config view &lt;span class="c1"># Show Merged kubeconfig settings.&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">beclt get nodes &lt;span class="c1"># Show all nodes in the cluster&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get services &lt;span class="c1"># List all services in the namespace&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get pods --all-namespaces &lt;span class="c1"># List all pods in all namespaces&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get pods -o wide &lt;span class="c1"># List all pods in the current namespace, with more details&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get deployment my-dep &lt;span class="c1"># List a particular deployment&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get pods &lt;span class="c1"># List all pods in the namespace&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get pod my-pod -o yaml &lt;span class="c1"># Get a pod&amp;#39;s YAML```&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Describe commands with verbose output
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl describe nodes my-node
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl describe pods my-pod
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">List Services Sorted by Name
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bectl get services --sort-by&lt;span class="o">=&lt;/span>.metadata.name
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ul>
-&lt;li>Updating resources&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl &lt;span class="nb">set&lt;/span> image deployment/frontend &lt;span class="nv">www&lt;/span>&lt;span class="o">=&lt;/span>image:v2 &lt;span class="c1"># Rolling update &amp;#34;www&amp;#34; containers of &amp;#34;frontend&amp;#34; deployment, updating the image&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl rollout &lt;span class="nb">history&lt;/span> deployment/frontend &lt;span class="c1"># Check the history of deployments including the revision &lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl rollout undo deployment/frontend &lt;span class="c1"># Rollback to the previous deployment&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl rollout undo deployment/frontend --to-revision&lt;span class="o">=&lt;/span>&lt;span class="m">2&lt;/span> &lt;span class="c1"># Rollback to a specific revision&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl rollout status -w deployment/frontend &lt;span class="c1"># Watch rolling update status of &amp;#34;frontend&amp;#34; deployment until completion&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl rollout restart deployment/frontend &lt;span class="c1"># Rolling restart of the &amp;#34;frontend&amp;#34; deployment&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ul>
-&lt;li>Allow kubectl without sudo priviledge &lt;code>sudo chmod 644 /etc/rancher/k3s/k3s.yaml&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="resources">Resources&lt;/h2>
-&lt;ul>
-&lt;li>Shout out to &lt;a class="link" href="https://github.com/TheQuib/k3s" target="_blank" rel="noopener"
->TheQuib&lt;/a> I thank him for his collaboration on this&lt;/li>
-&lt;li>Rancher &lt;a class="link" href="https://rancher.com/docs/k3s/latest/en/" target="_blank" rel="noopener"
->Documentation&lt;/a>&lt;/li>
-&lt;li>Docker Compose &lt;a class="link" href="https://docs.docker.com/compose/" target="_blank" rel="noopener"
->Documentation&lt;/a>&lt;/li>
-&lt;/ul></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kubernetes on Cinderblock</title><link>https://cinderblock.github.io/tags/kubernetes/</link><description>Recent content in Kubernetes on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 04 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Terraform - Azure Kubernetes Deployment</title><link>https://cinderblock.github.io/p/terraform-azure-kubernetes-deployment/</link><pubDate>Mon, 04 Apr 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-azure-kubernetes-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-azure-kubernetes-deployment/Terraform-DeployingKubernetesAKS.png" alt="Featured image of post Terraform - Azure Kubernetes Deployment" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Deplying a Kubernetes Cluster in Azure with the AKS service.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Build a Kubernetes cluster in Azure&lt;/li&gt;
+&lt;li&gt;Have the cluster setup to automatically scale with load&lt;/li&gt;
+&lt;li&gt;Have Kubeconfig file available so it can be managed, changed, altered, destroyed, etc.&lt;/li&gt;
+&lt;li&gt;Ensure Kubeconfig file is secure, and is being encrypted with traffic involved in this&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/Azure/Azure-K8S-Deploy" target="_blank" rel="noopener"
+&gt;GitHub (Azure-K8S-Deploy)&lt;/a&gt; at the repository!&lt;/strong&gt;&lt;/p&gt;
+&lt;h1 id="steps-to-do-this"&gt;Steps to do this&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;Have an Azure account; &lt;em&gt;if you are a student, sign up for a student account and get some free credits along side it.&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Setup Terraform files for the deployment&lt;/li&gt;
+&lt;li&gt;Keep track of Terraform State and Kubeconfig files in order to continue managaing deployed resources&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id="terraform-process"&gt;Terraform Process&lt;/h1&gt;
+&lt;h2 id="setting-up-providers-azurerm--kubernetes"&gt;Setting up Providers; Azurerm &amp;amp; Kubernetes&lt;/h2&gt;
+&lt;p&gt;Create a file named provider.tf &lt;!-- raw HTML omitted --&gt; I personally use the Azure CLI, this guide will be based on that. Use &lt;code&gt;az login&lt;/code&gt; to connect to your Azure resources. Refer to &lt;a class="link" href="https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli" target="_blank" rel="noopener"
+&gt;Microsoft&amp;rsquo;s documentation for Azure CLI&lt;/a&gt;. For Terraform, we are using the &lt;a class="link" href="https://registry.terraform.io/browse/providers" target="_blank" rel="noopener"
+&gt;Azurerm, and Kubernetes Poviders&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-tf" data-lang="tf"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;terraform&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;required_providers&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;azurerm&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;source&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;hashicorp/azurerm&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;version&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;3.0.2&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;provider&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;azurerm&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;features&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;provider&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;kubernetes&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;host&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;credneitals&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;host&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;client_certificate&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt; base64decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;credneitals&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;client_certificate&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;client_key&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt; base64decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;credneitals&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;client_key&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;cluster_ca_certificate&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt; base64decode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;credneitals&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster_ca_certificate&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="setting-up-the-kubernetes-structure"&gt;Setting up the Kubernetes structure&lt;/h2&gt;
+&lt;p&gt;Create a file nameed cluster.tf. &lt;!-- raw HTML omitted --&gt; Within this file, we will define required networking and cluster resources/data parameters.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;span class="lnt"&gt;43
+&lt;/span&gt;&lt;span class="lnt"&gt;44
+&lt;/span&gt;&lt;span class="lnt"&gt;45
+&lt;/span&gt;&lt;span class="lnt"&gt;46
+&lt;/span&gt;&lt;span class="lnt"&gt;47
+&lt;/span&gt;&lt;span class="lnt"&gt;48
+&lt;/span&gt;&lt;span class="lnt"&gt;49
+&lt;/span&gt;&lt;span class="lnt"&gt;50
+&lt;/span&gt;&lt;span class="lnt"&gt;51
+&lt;/span&gt;&lt;span class="lnt"&gt;52
+&lt;/span&gt;&lt;span class="lnt"&gt;53
+&lt;/span&gt;&lt;span class="lnt"&gt;54
+&lt;/span&gt;&lt;span class="lnt"&gt;55
+&lt;/span&gt;&lt;span class="lnt"&gt;56
+&lt;/span&gt;&lt;span class="lnt"&gt;57
+&lt;/span&gt;&lt;span class="lnt"&gt;58
+&lt;/span&gt;&lt;span class="lnt"&gt;59
+&lt;/span&gt;&lt;span class="lnt"&gt;60
+&lt;/span&gt;&lt;span class="lnt"&gt;61
+&lt;/span&gt;&lt;span class="lnt"&gt;62
+&lt;/span&gt;&lt;span class="lnt"&gt;63
+&lt;/span&gt;&lt;span class="lnt"&gt;64
+&lt;/span&gt;&lt;span class="lnt"&gt;65
+&lt;/span&gt;&lt;span class="lnt"&gt;66
+&lt;/span&gt;&lt;span class="lnt"&gt;67
+&lt;/span&gt;&lt;span class="lnt"&gt;68
+&lt;/span&gt;&lt;span class="lnt"&gt;69
+&lt;/span&gt;&lt;span class="lnt"&gt;70
+&lt;/span&gt;&lt;span class="lnt"&gt;71
+&lt;/span&gt;&lt;span class="lnt"&gt;72
+&lt;/span&gt;&lt;span class="lnt"&gt;73
+&lt;/span&gt;&lt;span class="lnt"&gt;74
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-tf" data-lang="tf"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Resource Group for Terraform deployment
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="kr"&gt;resource&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;azurerm_resource_group&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prefix&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;-cluster&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;region&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Networking Setup for Cluster
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="kr"&gt;resource&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;azurerm_virtual_network&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prefix&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;-network&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;location&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;resource_group_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;address_space&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;10.1.0.0/16&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;resource&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;azurerm_subnet&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prefix&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;-subnet&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;virtual_network_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_virtual_network&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;resource_group_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;address_prefixes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;10.1.0.0/24&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;resource&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;azurerm_kubernetes_cluster&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prefix&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;-aks&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;location&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;location&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;resource_group_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;dns_prefix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prefix&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;-aks&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;linux_profile&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;admin_username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;ubuntu&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;ssh_key&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;key_data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ssh_public_key&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;default_node_pool&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;agentpool&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;node_count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;var&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster_nodes_count&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;vm_size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;Standard_B2s&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;VirtualMachineScaleSets&amp;#34;&lt;/span&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt; #availability_zones = [&amp;#34;1&amp;#34;, &amp;#34;2&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt; &lt;span class="nx"&gt;enable_auto_scaling&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;min_count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;max_count&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt; # Required for advanced networking
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt; &lt;span class="nx"&gt;vnet_subnet_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_subnet&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;identity&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;SystemAssigned&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;network_profile&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;network_plugin&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;kubenet&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;load_balancer_sku&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;standard&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;tags&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;Environment&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;Development&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Required to be pushed into Kubernetes Provid`er in provider.tf
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;azurerm_kubernetes_cluster&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;credneitals&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;resource_group_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;depends_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# This will bring down the required kubeconfig locally to your machine
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="kr"&gt;resource&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;local_file&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;kubeconfig&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;depends_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;./kubeconfig&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config_raw&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="assigning-variables-for-terraform"&gt;Assigning variables for Terraform&lt;/h2&gt;
+&lt;p&gt;Create a file named variables.tf. &lt;!-- raw HTML omitted --&gt; Generally, these variables within the file are ready to go. Ensure the public key is pointing to your SSH key.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-tf" data-lang="tf"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;variable&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster_name&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;terraformclust&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;variable&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster_nodes_count&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;2&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;variable&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;region&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;East US 2&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;variable&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;prefix&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;az-ter&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;variable&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;ssh_public_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;./id_rsa.pub&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="creating-outputs-to-be-sent-back-after-terraform-finishes-running"&gt;Creating outputs to be sent back after Terraform finishes running&lt;/h2&gt;
+&lt;p&gt;Create a file named output.tf. &lt;!-- raw HTML omitted --&gt; Certain parts of the output file are critical to get access to the cluster once it is spun up. Specifically the cluster_name, and resource_group_name outputs are essential.These will be used in order to obtain kubectl access for managing the cluster. I included a few extra output resources for future usage.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;span class="lnt"&gt;43
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-tf" data-lang="tf"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;client_key&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;client_key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;client_certificate&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;client_certificate&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster_ca_certificate&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster_ca_certificate&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster_username&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;username&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster_password&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;password&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;kube_config&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config_raw&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;host&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;kube_config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;host&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;sensitive&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Critical to get kubectl file connected out to Azure for local environment
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;cluster_name&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_kubernetes_cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;output&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;resource_group_name&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;azurerm_resource_group&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cluster&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="gain-access-to-kubectl"&gt;Gain access to Kubectl&lt;/h2&gt;
+&lt;p&gt;In order to gain access from your local machine, we will use the azure CLI. If you followed the tutorial, you&amp;rsquo;ll already be logged in, &lt;code&gt;az login&lt;/code&gt;. Use the following command to set your environment varialbe for kubectl to control kubernetes cluster in Azure.
+&lt;code&gt;az aks get-credentials --resource-group $(terraform output -raw resource_group_name) --name $(terraform output -raw cluster_name)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Once ran, you can verify it is connected and working with &lt;code&gt;kubectl get nodes&lt;/code&gt; , &lt;code&gt;kubectl get namespace&lt;/code&gt;&lt;/p&gt;
+&lt;h1 id="useful-resources"&gt;Useful Resources&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://learnk8s.io/terraform-aks" target="_blank" rel="noopener"
+&gt;Kubernetes Overview&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://registry.terraform.io/providers/hashicorp/kubernetes/latest" target="_blank" rel="noopener"
+&gt;Terraform Kubernetes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://registry.terraform.io/providers/hashicorp/azurerm/latest" target="_blank" rel="noopener"
+&gt;Terraform Azurerm&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>K3S - Highly-Available-Rancher</title><link>https://cinderblock.github.io/p/k3s-highly-available-rancher/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/k3s-highly-available-rancher/</guid><description>&lt;img src="https://cinderblock.github.io/p/k3s-highly-available-rancher/k3sRancher.png" alt="Featured image of post K3S - Highly-Available-Rancher" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Getting started with K3S: &lt;!-- raw HTML omitted --&gt;
+The primary goal here is to setup a functional highly available K3S cluster. This will include 4 necessary steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Setup NGINX Loadbalancer Docker&lt;/li&gt;
+&lt;li&gt;Setup MySQL Docker&lt;/li&gt;
+&lt;li&gt;Setup Highly Available K3s Cluster&lt;/li&gt;
+&lt;li&gt;(Optional) Setup management from dev machine (Controller)&lt;/li&gt;
+&lt;li&gt;Setup Rancher as a container within the cluster&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Kubernetes/k3s-HACluster-Rancher" target="_blank" rel="noopener"
+&gt;GitHub (k3s-HACluster-Rancher)&lt;/a&gt; at the repository!&lt;/strong&gt;&lt;/p&gt;
+&lt;h1 id="prerequisites"&gt;Prerequisites&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Have a dedicated Docker host virtual machine, preferrably linux&lt;/li&gt;
+&lt;li&gt;Have 5 Linux virtual machines ready
+&lt;ul&gt;
+&lt;li&gt;Two will be Master Nodes, and Three will be worker nodes. Each will have a dedicated IP address.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I personally ran all of my linux Virtual Machines as Ubuntu Server 20.04&lt;/p&gt;
+&lt;h1 id="1-setup-nginx-loadbalancer-docker"&gt;1. Setup NGINX Loadbalancer Docker&lt;/h1&gt;
+&lt;p&gt;Log into your dedicated docker linux host and create a NGINX Loadbalancer using docker &lt;!-- raw HTML omitted --&gt;
+Ensure docker-compose is installed&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo curl -L &amp;quot;https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)&amp;quot; -o /usr/local/bin/docker-compose&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo chmod +x /usr/local/bin/docker-compose&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After setup, create a directory for nginx, and create a file called docker-compose.yml with the following contents&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;3&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;nginx&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;nginx:latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;nginx&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;./nginx.conf:/etc/nginx/nginx.conf&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="m"&gt;80&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m"&gt;80&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="m"&gt;443&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m"&gt;443&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="m"&gt;6443&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m"&gt;6443&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;on&lt;/span&gt;-&lt;span class="l"&gt;failure&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;In the same directorty, create a nginx.conf file with the following contet:
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;change &amp;lt;IP_MASTER_NODE1 &amp;amp; 2&amp;gt; to your two node IP addresses. Change &amp;lt;IP_NODE_1,2,3&amp;gt; to Worker Node IPs&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;events{}
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; stream {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; upstream k3s_servers {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_MASTER_NODE_1&amp;gt;:6443;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_MASTER_NODE_2&amp;gt;:6443;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; listen 6443;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; proxy_pass k3s_servers;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; upstream rancher_servers_http {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; least_conn;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_NODE_1&amp;gt;:80 max_fails=3 fail_timeout=5s;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_NODE_2&amp;gt;:80 max_fails=3 fail_timeout=5s;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_NODE_3&amp;gt;:80 max_fails=3 fail_timeout=5s;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; listen 80;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; proxy_pass rancher_servers_http;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; upstream rancher_servers_https {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; least_conn;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_NODE_1&amp;gt;:443 max_fails=3 fail_timeout=5s;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_NODE_2&amp;gt;:443 max_fails=3 fail_timeout=5s;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server &amp;lt;IP_NODE_3&amp;gt;:443 max_fails=3 fail_timeout=5s;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; server {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; listen 443;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; proxy_pass rancher_servers_https;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Commands to setup:
+&lt;ul&gt;
+&lt;li&gt;Change nginx.conf file to match your configuration&lt;/li&gt;
+&lt;li&gt;Enter file directory of nginx and apply &lt;code&gt;sudo docker-compose up -d&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="2-setup-mysql-docker"&gt;2. Setup MySQL Docker&lt;/h1&gt;
+&lt;p&gt;On the same dedicated docker host that the nginx loadbalancer is running on:
+Create new directory for mysql and put a docker-compose.yml file in it with the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nn"&gt;---&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;3.1&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;mysql&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;mysql:latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;always&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;mysql&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="m"&gt;3306&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="m"&gt;3306&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;expose&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;3306&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;./mysql-data:/var/lib/mysql/&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;environment&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;MYSQL_ROOT_PASSWORD=enter-your-password&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Commands to setup:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Enter file directory of mysql and apply &lt;code&gt;sudo docker-compose up -d&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Enter the docker to execute commands
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo docker exec -it mysql bash&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mysql -p&lt;/code&gt; &lt;em&gt;(Enter password)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Next, create the database and assign a user to it to be used with the K3s cluster within the mysql bash shell using the following SQL commands.
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change &amp;lsquo;password&amp;rsquo; and &amp;lsquo;user&amp;rsquo; to your desired variables&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;DATABASE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k3s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;COLLATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;latin1_swedish_ci&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;USER&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;‘&lt;/span&gt;&lt;span class="k"&gt;user&lt;/span&gt;&lt;span class="err"&gt;’&lt;/span&gt;&lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="err"&gt;’&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="err"&gt;’&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;IDENTIFIED&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;BY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;‘&lt;/span&gt;&lt;span class="n"&gt;password&lt;/span&gt;&lt;span class="err"&gt;’&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;GRANT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ALL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ON&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;k3s&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TO&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;user&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;FLUSH&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;PRIVILEGES&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To Note: the Database &lt;em&gt;MUST&lt;/em&gt; be &lt;em&gt;latin1_swedish_ci&lt;/em&gt;&lt;/p&gt;
+&lt;h1 id="3-setup-highly-available-k3s-cluster"&gt;3. Setup Highly Available K3s Cluster&lt;/h1&gt;
+&lt;p&gt;These will be setup in three steps. The first, setting up the first master node in the K3s cluster. Then, joining an additional master node. Finally, adding the worker nodes.&lt;/p&gt;
+&lt;h2 id="1-primary-master-node-setup"&gt;1. Primary Master Node setup&lt;/h2&gt;
+&lt;p&gt;On the first Server node run these commands:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;export K3S_DATASTORE_ENDPOINT='mysql://user:password@tcp(sqlhost:3306)/database-name&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change values to your database values. &amp;lsquo;user&amp;rsquo;, &amp;lsquo;password&amp;rsquo;, &amp;lsquo;sqlhost&amp;rsquo;, &amp;lsquo;database-name&amp;rsquo;&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;curl -sfL https://get.k3s.io | sh -s - server --node-taint CriticalAddonsOnly=true:NoExecute --tls-san 'Load-Balancer-Address'&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After it has connected and you can successfully, check and ensure you can see the node with &lt;code&gt;sudo kubectl get nodes&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Obtain node-token from &lt;code&gt;sudo cat /var/lib/rancher/k3s/server/node-token&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;This will be used in the next steps to join the second master node and the workers&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-secondary-master-node-setup"&gt;2. Secondary Master Node setup&lt;/h2&gt;
+&lt;p&gt;On additional server nodes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;export K3S_DATASTORE_ENDPOINT='mysql://user:password@tcp(sqlhost:3306)/database-name&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change values to your database values. &amp;lsquo;user&amp;rsquo;, &amp;lsquo;password&amp;rsquo;, &amp;lsquo;sqlhost&amp;rsquo;, &amp;lsquo;database-name&amp;rsquo;&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Curl -sfL https://get.k3s.io | sh -s - server --node-taint CriticalAddonsOnly=true:NoExecute --tls-san 'Load-Balancer-Address' --token server-token-here sh -&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change values to your database values. &amp;lsquo;Load-Balancer-Address&amp;rsquo;, &amp;lsquo;server-token-here&amp;rsquo;&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-worker-node-setup"&gt;3. Worker Node Setup&lt;/h2&gt;
+&lt;p&gt;On all client agents to be added to cluster&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;export K3S_DATASTORE_ENDPOINT='mysql://user:password@tcp(sqlhost:3306)/database-name'&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change values to your database values. &amp;lsquo;user&amp;rsquo;, &amp;lsquo;password&amp;rsquo;, &amp;lsquo;sqlhost&amp;rsquo;, &amp;lsquo;database-name&amp;rsquo;&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;curl -sfL https://get.k3s.io | K3S_URL=https://'Load-Balance-Address':6443 K3S_TOKEN=server-token-here sh -&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change values to your database values. &amp;lsquo;Load-Balancer-Address&amp;rsquo;, &amp;lsquo;K3S_TOKEN=server-token-here&amp;rsquo;&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="4-optional-setup-management-from-dev-machine-controller"&gt;4. (Optional) Setup management from dev machine (Controller)&lt;/h1&gt;
+&lt;p&gt;Once Cluster has been setup&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;install k3s on controller machine w/ &lt;code&gt;curl -LO &amp;quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;On a server node run:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo nano /etc/rancher/k3s/k3s.yaml&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Copy contents of that file to a file on your dev machine at location /home/user/.kube/config
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Change IP address in config to match your Load Balancer&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;verify it is working w/ &lt;code&gt;kubectl cluster-info&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can now control your K3s cluster from another machine, outside of the cluster!&lt;/p&gt;
+&lt;h1 id="5-setup-rancher-as-a-container-within-the-cluster"&gt;5. Setup Rancher as a container within the cluster&lt;/h1&gt;
+&lt;p&gt;Deploying Rancher on Workers using Helm &lt;!-- raw HTML omitted --&gt;
+This deployment will be using the self-generated Rancher Certificate. &lt;!-- raw HTML omitted --&gt;
+Either from a Master Node, or the Controller machine (If you followed step 4):&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Add the Helm Chart Repository&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Install helm
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chmod 700 get_helm.sh&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;./get_helm.sh&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Use Stable release: &lt;code&gt;helm repo add rancher-stable https://releases.rancher.com/server-charts/stable&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create Namespace within K3s for Rancher&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;kubectl create namespace cattle-system&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Install Cert Manager (Required for self-hosted cert)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;helm repo add jetstack https://charts.jetstack.io&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;helm repo update&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; helm install cert-manager jetstack/cert-manager &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="se"&gt;&lt;/span&gt; --namespace cert-manager &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="se"&gt;&lt;/span&gt; --create-namespace &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="se"&gt;&lt;/span&gt; --version v1.5.1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;em&gt;If you experience an issue running this, such as localhost:8080 error, add KUBECONFIG as an environment variable to fix it:&lt;/em&gt; &lt;code&gt;export KUBECONFIG=/etc/rancher/k3s/k3s.yaml&lt;/code&gt;
+&lt;em&gt;If that does not fix it, ensure the .kube config file exists in the proper locaiton&lt;/em&gt; &lt;code&gt;kubectl config view --raw &amp;gt; ~/.kube/config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Verify it is working w/ &lt;code&gt;kubectl get pods --namespace cert-manager&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Install Rancher using Helm&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; helm install rancher rancher-stable/rancher \
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --namespace cattle-system \
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --set hostname=port.lan \
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --set replicas=3 \
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --set bootstrapPassword=password
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Check on deployment w/ &lt;code&gt;kubectl -n cattle-system rollout status deploy/rancher&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Once finished, obtain info on deployment w/ &lt;code&gt;kubectl -n cattle-system get deploy rancher&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Once Rancher is deployed&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Navigate to {LoadBalancer-DNS} site
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;It must be the DNS entry of the Load Balancer due to the certification. An IP adddress will NOT work&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Find your secret using command given at site login, and log into the site&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Bam, Rancher installed, and it is now highly available.&lt;/p&gt;
+&lt;h2 id="troubeshooting-rancher"&gt;Troubeshooting Rancher&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;If you must uninstall and reinstall Rancher for any reason, I recommend these steps (They are painful)
+&lt;ul&gt;
+&lt;li&gt;For the name spaces affecting Rancher Directly,&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo kubectl delete namespace namespace-name&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Check it w/ &lt;code&gt;kubectl get ns&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;If stuck in terminating, &lt;code&gt;kubectl edit ns namespace-name&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;Delete everything under the finalizer: fields (Sometimes there are two.)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="useful-resources--commands"&gt;Useful Resources &amp;amp; Commands&lt;/h1&gt;
+&lt;h2 id="useful-docker-commands"&gt;Useful Docker Commands&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;The load balancer and database are setup using Docker-compose
+&lt;ul&gt;
+&lt;li&gt;Useful Docker compose commands:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Sping up a docker based on docker-compose.yml file&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; docker-compose up -f &lt;span class="s1"&gt;&amp;#39;filenamehere&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Sping up a docker and keep it running&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; docker-compose up -d
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Find list of running docker processes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Get into shell of a running docker&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; docker &lt;span class="nb"&gt;exec&lt;/span&gt; -it &lt;span class="o"&gt;[&lt;/span&gt;option&lt;span class="o"&gt;]&lt;/span&gt; bash
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;# Update running docker with new configuration changes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; docker-compose up -d --force-recreate
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="useful-kubectl-commands"&gt;Useful Kubectl Commands&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Kubernetes commands (Mostly pulled from &lt;a class="link" href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/" target="_blank" rel="noopener"
+&gt;kubectl cheat sheet&lt;/a&gt;)
+&lt;ul&gt;
+&lt;li&gt;Finding ressources&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Get commands with basic output&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl config view &lt;span class="c1"&gt;# Show Merged kubeconfig settings.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubeclt get nodes &lt;span class="c1"&gt;# Show all nodes in the cluster&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get services &lt;span class="c1"&gt;# List all services in the namespace&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get pods --all-namespaces &lt;span class="c1"&gt;# List all pods in all namespaces&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get pods -o wide &lt;span class="c1"&gt;# List all pods in the current namespace, with more details&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get deployment my-dep &lt;span class="c1"&gt;# List a particular deployment&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get pods &lt;span class="c1"&gt;# List all pods in the namespace&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get pod my-pod -o yaml &lt;span class="c1"&gt;# Get a pod&amp;#39;s YAML```&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Describe commands with verbose output&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl describe nodes my-node
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl describe pods my-pod
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# List Services Sorted by Name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl get services --sort-by&lt;span class="o"&gt;=&lt;/span&gt;.metadata.name
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Updating resources&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl &lt;span class="nb"&gt;set&lt;/span&gt; image deployment/frontend &lt;span class="nv"&gt;www&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;image:v2 &lt;span class="c1"&gt;# Rolling update &amp;#34;www&amp;#34; containers of &amp;#34;frontend&amp;#34; deployment, updating the image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl rollout &lt;span class="nb"&gt;history&lt;/span&gt; deployment/frontend &lt;span class="c1"&gt;# Check the history of deployments including the revision &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl rollout undo deployment/frontend &lt;span class="c1"&gt;# Rollback to the previous deployment&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl rollout undo deployment/frontend --to-revision&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="c1"&gt;# Rollback to a specific revision&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl rollout status -w deployment/frontend &lt;span class="c1"&gt;# Watch rolling update status of &amp;#34;frontend&amp;#34; deployment until completion&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kubectl rollout restart deployment/frontend &lt;span class="c1"&gt;# Rolling restart of the &amp;#34;frontend&amp;#34; deployment&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Allow kubectl without sudo priviledge &lt;code&gt;sudo chmod 644 /etc/rancher/k3s/k3s.yaml&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="resources"&gt;Resources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Shout out to &lt;a class="link" href="https://github.com/TheQuib/k3s" target="_blank" rel="noopener"
+&gt;TheQuib&lt;/a&gt; I thank him for his collaboration on this&lt;/li&gt;
+&lt;li&gt;Rancher &lt;a class="link" href="https://rancher.com/docs/k3s/latest/en/" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Docker Compose &lt;a class="link" href="https://docs.docker.com/compose/" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

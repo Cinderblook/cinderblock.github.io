@@ -1,163 +1,163 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMWare on Cinderblock</title><link>https://cinderblock.github.io/tags/vmware/</link><description>Recent content in VMWare on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 04 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>Utilizing USB to Eth for VMWare</title><link>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</link><pubDate>Fri, 04 Aug 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/USB-to-ETH-VMWARE.png" alt="Featured image of post Utilizing USB to Eth for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>I stumbled upon a collection of affordable Dell Optiplex 7060 Micros, equipped with exceptional specs for a homelab cluster ESXi environment. However, I faced a challenge in having only one Ethernet interface on each host, when I needed dedicated ISCSI storage on a separate interface. I found a solution using custom drivers for specific USB to Ethernet adapters, supported unofficially by VMware staff.&lt;/p>
-&lt;h2 id="choosing-the-adapters">Choosing the Adapters&lt;/h2>
-&lt;p>Make sure to select a USB to Ethernet adapter that&amp;rsquo;s compatible. See a list of &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#requirements" target="_blank" rel="noopener"
->officially unsupported but working adapters on VMware&amp;rsquo;s site&lt;/a>, or choose the one I used &lt;a class="link" href="https://www.amazon.com/dp/B00YUU3KC6?psc=1&amp;amp;ref=ppx_yo2ov_dt_b_product_details" target="_blank" rel="noopener"
->from Amazon&lt;/a>.&lt;/p>
-&lt;ul>
-&lt;li>The adapter I chose, is a TP-Link E300, with a Realtek RTL8153 chip, that supports 10/100/1000MB speeds.&lt;/li>
-&lt;/ul>
-&lt;h2 id="physical-and-ssh-access">Physical and SSH Access&lt;/h2>
-&lt;p>You&amp;rsquo;ll need physical access to install the adapters and connect them to the network (either directly to the ISCSI interface or through a dedicated VLAN). On the ESXi host(s), go to &lt;a class="link" href="https://ip.address:443" target="_blank" rel="noopener"
->https://ip.address:443&lt;/a> to enable SSH if needed.&lt;/p>
-&lt;h2 id="installing-the-vmware-driver">Installing the VMware Driver&lt;/h2>
-&lt;ul>
-&lt;li>
-&lt;p>Download the driver from &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#summary" target="_blank" rel="noopener"
->VMware&lt;/a>. Ensure the correct version based on the ESXi hosts.&lt;/p>
-&lt;ul>
-&lt;li>Do a quick check on the host with &lt;code>vmware -v&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>Transfer it to the host(s) and install:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">scp /file/location &amp;lt;user&amp;gt;@&amp;lt;ip-esxi-host&amp;gt;:/location/to/put/file
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ssh &amp;lt;user&amp;gt;@&amp;lt;ip&amp;gt;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">esxcli software component apply -d /path/to/the component zip
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">reboot
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="configuring-usb-to-ethernet-usage">Configuring USB to Ethernet Usage&lt;/h2>
-&lt;ul>
-&lt;li>
-&lt;p>After rebooting, create a new NIC on the ESXi host or in vSphere.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Confirm proper configuration within the GUI, then run within the SSH console:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">esxcli system module parameters &lt;span class="nb">set&lt;/span> -p &lt;span class="s2">&amp;#34;usbBusFullScanOnBootEnabled=1&amp;#34;&lt;/span> -m vmkusb_nic_fling
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;li>
-&lt;p>Edit the local.sh file:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vi /etc/rc.local.d/local.sh
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>Add this snippet:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">vusb0_status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>esxcli network nic get -n vusb0 &lt;span class="p">|&lt;/span> grep &lt;span class="s1">&amp;#39;Link Status&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{print $NF}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">0&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="o">[[&lt;/span> &lt;span class="nv">$count&lt;/span> -lt &lt;span class="m">20&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">vusb0_status&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> !&lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;Up&amp;#34;&lt;/span> &lt;span class="o">]]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">do&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sleep &lt;span class="m">10&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$((&lt;/span> &lt;span class="nv">$count&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="k">))&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">vusb0_status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>esxcli network nic get -n vusb0 &lt;span class="p">|&lt;/span> grep &lt;span class="s1">&amp;#39;Link Status&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{print $NF}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">done&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">esxcfg-vswitch -R
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;li>
-&lt;p>Add the provided code, and if you need support for multiple adapters, see more details &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#instructions" target="_blank" rel="noopener"
->here&lt;/a>.&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="conclusion">Conclusion&lt;/h2>
-&lt;p>Verify the network connectivity, and you&amp;rsquo;ll now have a dedicated management port and an additional ISCSI NAS port for HA failover. Additionally, if you are like me, an affordable solution created to creating additional network interfaces on a Dell Optiplex 7060 Micro!&lt;/p></description></item><item><title>Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post Migrating Proxmox Raw LVM to VMDK for VMWare" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Converting a Proxmox virtual machine to a vmdk for VMWare. In this, I will be doing so with virtual machines in LVM Raw format in Proxmox, into VMDKs for transfer from the Proxmox Hyper-viser to a ESXI hyper-viser.&lt;/p>
-&lt;h2 id="find-critical-data-of-proxmox-vm">Find critical data of Proxmox VM&lt;/h2>
-&lt;p>First within Proxmox, navigate to the VM in question, and see its location, and data type. Assuming it may be a LVM. Ensure you write down the total CPU count and RAM usage, as it should mirror it on first startup in VMWare. Otherwise it may corrupt.&lt;/p>
-&lt;ul>
-&lt;li>Gather data for VM in question:
-&lt;ul>
-&lt;li>&lt;code>qm status &amp;lt;vmid&amp;gt;&lt;/code>&lt;/li>
-&lt;li>&lt;code>qm config &amp;lt;vmid&amp;gt;&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Find pathing:
-&lt;ul>
-&lt;li>&lt;code>pvesm path &amp;lt;storage-identifier&amp;gt;:&amp;lt;disk&amp;gt;&lt;/code>&lt;/li>
-&lt;li>&lt;code>lvdisplay /dev/&amp;lt;storage&amp;gt;/vm-&amp;lt;vmid&amp;gt;-disk-0&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>If you cannot find it, I have noticed Proxmox likes to deactivate LVMs once the VM is offline. You can change this by running &lt;code>lvscan&lt;/code>, and then running &lt;code>lvchange --activate /dev/&amp;lt;storage-pool&amp;gt;/&amp;lt;Disk-ID&amp;gt;&lt;/code>&lt;/em>&lt;/p>
-&lt;h2 id="convert-disk-from-lvm-to-vmdk">Convert disk from LVM to VMDK&lt;/h2>
-&lt;ul>
-&lt;li>Once disk is found, convert it to a vmdk
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qemu-img convert -f raw /dev/storage/vm-&amp;lt;vmid&amp;gt;-disk-0 -O vmdk &amp;lt;name-of-vmdk-file-to-create&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="move-the-disk">Move the disk&lt;/h2>
-&lt;ul>
-&lt;li>Copy disk over to your VMWare host (Or specified storage location)
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">scp &amp;lt;disk-location&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;ip/fqdn&amp;gt;:&amp;lt;destination-file&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="clone-to-a-thin-provision">Clone to a thin provision&lt;/h2>
-&lt;p>I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;h2 id="create-virtual-machine-in-vcenter">Create Virtual Machine in vCenter&lt;/h2>
-&lt;p>In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)&lt;/p>
-&lt;p>Again, ensure your RAM/CPU configuration matches that of the Proxmox configuration.&lt;/p>
-&lt;p>If it fails, just try again, its easy to miss one step and have an issue here.&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMWare on Cinderblock</title><link>https://cinderblock.github.io/tags/vmware/</link><description>Recent content in VMWare on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 04 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/vmware/index.xml" rel="self" type="application/rss+xml"/><item><title>Utilizing USB to Eth for VMWare</title><link>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</link><pubDate>Fri, 04 Aug 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/utilizing-usb-to-eth-for-vmware/USB-to-ETH-VMWARE.png" alt="Featured image of post Utilizing USB to Eth for VMWare" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;I stumbled upon a collection of affordable Dell Optiplex 7060 Micros, equipped with exceptional specs for a homelab cluster ESXi environment. However, I faced a challenge in having only one Ethernet interface on each host, when I needed dedicated ISCSI storage on a separate interface. I found a solution using custom drivers for specific USB to Ethernet adapters, supported unofficially by VMware staff.&lt;/p&gt;
+&lt;h2 id="choosing-the-adapters"&gt;Choosing the Adapters&lt;/h2&gt;
+&lt;p&gt;Make sure to select a USB to Ethernet adapter that&amp;rsquo;s compatible. See a list of &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#requirements" target="_blank" rel="noopener"
+&gt;officially unsupported but working adapters on VMware&amp;rsquo;s site&lt;/a&gt;, or choose the one I used &lt;a class="link" href="https://www.amazon.com/dp/B00YUU3KC6?psc=1&amp;amp;ref=ppx_yo2ov_dt_b_product_details" target="_blank" rel="noopener"
+&gt;from Amazon&lt;/a&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The adapter I chose, is a TP-Link E300, with a Realtek RTL8153 chip, that supports 10/100/1000MB speeds.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="physical-and-ssh-access"&gt;Physical and SSH Access&lt;/h2&gt;
+&lt;p&gt;You&amp;rsquo;ll need physical access to install the adapters and connect them to the network (either directly to the ISCSI interface or through a dedicated VLAN). On the ESXi host(s), go to &lt;a class="link" href="https://ip.address:443" target="_blank" rel="noopener"
+&gt;https://ip.address:443&lt;/a&gt; to enable SSH if needed.&lt;/p&gt;
+&lt;h2 id="installing-the-vmware-driver"&gt;Installing the VMware Driver&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Download the driver from &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#summary" target="_blank" rel="noopener"
+&gt;VMware&lt;/a&gt;. Ensure the correct version based on the ESXi hosts.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Do a quick check on the host with &lt;code&gt;vmware -v&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Transfer it to the host(s) and install:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;scp /file/location &amp;lt;user&amp;gt;@&amp;lt;ip-esxi-host&amp;gt;:/location/to/put/file
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh &amp;lt;user&amp;gt;@&amp;lt;ip&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;esxcli software component apply -d /path/to/the component zip
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reboot
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="configuring-usb-to-ethernet-usage"&gt;Configuring USB to Ethernet Usage&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;After rebooting, create a new NIC on the ESXi host or in vSphere.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Confirm proper configuration within the GUI, then run within the SSH console:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;esxcli system module parameters &lt;span class="nb"&gt;set&lt;/span&gt; -p &lt;span class="s2"&gt;&amp;#34;usbBusFullScanOnBootEnabled=1&amp;#34;&lt;/span&gt; -m vmkusb_nic_fling
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Edit the local.sh file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vi /etc/rc.local.d/local.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Add this snippet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;vusb0_status&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;esxcli network nic get -n vusb0 &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;Link Status&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{print $NF}&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$count&lt;/span&gt; -lt &lt;span class="m"&gt;20&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;vusb0_status&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;Up&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; sleep &lt;span class="m"&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt; &lt;span class="nv"&gt;$count&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="k"&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nv"&gt;vusb0_status&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;esxcli network nic get -n vusb0 &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s1"&gt;&amp;#39;Link Status&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{print $NF}&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;esxcfg-vswitch -R
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add the provided code, and if you need support for multiple adapters, see more details &lt;a class="link" href="https://flings.vmware.com/usb-network-native-driver-for-esxi#instructions" target="_blank" rel="noopener"
+&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="conclusion"&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Verify the network connectivity, and you&amp;rsquo;ll now have a dedicated management port and an additional ISCSI NAS port for HA failover. Additionally, if you are like me, an affordable solution created to creating additional network interfaces on a Dell Optiplex 7060 Micro!&lt;/p&gt;</description></item><item><title>Migrating Proxmox Raw LVM to VMDK for VMWare</title><link>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</link><pubDate>Sun, 16 Jul 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/</guid><description>&lt;img src="https://cinderblock.github.io/p/migrating-proxmox-raw-lvm-to-vmdk-for-vmware/proxmoxvm-to-vmwarevm.png" alt="Featured image of post Migrating Proxmox Raw LVM to VMDK for VMWare" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Converting a Proxmox virtual machine to a vmdk for VMWare. In this, I will be doing so with virtual machines in LVM Raw format in Proxmox, into VMDKs for transfer from the Proxmox Hyper-viser to a ESXI hyper-viser.&lt;/p&gt;
+&lt;h2 id="find-critical-data-of-proxmox-vm"&gt;Find critical data of Proxmox VM&lt;/h2&gt;
+&lt;p&gt;First within Proxmox, navigate to the VM in question, and see its location, and data type. Assuming it may be a LVM. Ensure you write down the total CPU count and RAM usage, as it should mirror it on first startup in VMWare. Otherwise it may corrupt.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Gather data for VM in question:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;qm status &amp;lt;vmid&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;qm config &amp;lt;vmid&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Find pathing:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;pvesm path &amp;lt;storage-identifier&amp;gt;:&amp;lt;disk&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lvdisplay /dev/&amp;lt;storage&amp;gt;/vm-&amp;lt;vmid&amp;gt;-disk-0&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;If you cannot find it, I have noticed Proxmox likes to deactivate LVMs once the VM is offline. You can change this by running &lt;code&gt;lvscan&lt;/code&gt;, and then running &lt;code&gt;lvchange --activate /dev/&amp;lt;storage-pool&amp;gt;/&amp;lt;Disk-ID&amp;gt;&lt;/code&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id="convert-disk-from-lvm-to-vmdk"&gt;Convert disk from LVM to VMDK&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Once disk is found, convert it to a vmdk
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;qemu-img convert -f raw /dev/storage/vm-&amp;lt;vmid&amp;gt;-disk-0 -O vmdk &amp;lt;name-of-vmdk-file-to-create&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="move-the-disk"&gt;Move the disk&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Copy disk over to your VMWare host (Or specified storage location)
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;scp &amp;lt;disk-location&amp;gt; &amp;lt;user&amp;gt;@&amp;lt;ip/fqdn&amp;gt;:&amp;lt;destination-file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="clone-to-a-thin-provision"&gt;Clone to a thin provision&lt;/h2&gt;
+&lt;p&gt;I find this step necessary, as in my experience, the disk corrupts if not forced into a thin provision disk.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;SSH into the VMWare host, and go into the directory the file is copied into. Run the following command, it will clone the disk and not delete the copied .vmdk.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;vmkfstools -i &amp;lt;copied-file-name&amp;gt;.vmdk &amp;lt;new-file-name&amp;gt;.vmdk -d thin
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="create-virtual-machine-in-vcenter"&gt;Create Virtual Machine in vCenter&lt;/h2&gt;
+&lt;p&gt;In your ESXI/vCenter environment, create a new VM, and ensure you add an existing HDD to it, mapped to the location of the new .vmdk disk file. Addiitonally, ensure your drive controller is set correctly. (Likely will default ISCSI, and short be SATA.)&lt;/p&gt;
+&lt;p&gt;Again, ensure your RAM/CPU configuration matches that of the Proxmox configuration.&lt;/p&gt;
+&lt;p&gt;If it fails, just try again, its easy to miss one step and have an issue here.&lt;/p&gt;</description></item></channel></rss>

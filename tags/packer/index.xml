@@ -1,435 +1,435 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>packer on Cinderblock</title><link>https://cinderblock.github.io/tags/packer/</link><description>Recent content in packer on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 30 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/packer/index.xml" rel="self" type="application/rss+xml"/><item><title>Packer - Proxmox Ubuntu Server Creation</title><link>https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/</link><pubDate>Sat, 30 Jul 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/</guid><description>&lt;img src="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker.png" alt="Featured image of post Packer - Proxmox Ubuntu Server Creation" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Using Packer to create a Ubunut 22.04 server image within Proxmox. This is designed with Proxmox Virtual Environment version 7.1 in mind.&lt;/p>
-&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Packer/Proxmox/packer-iso-ubuntu" target="_blank" rel="noopener"
->GitHub&lt;/a> at the repository.&lt;/strong>&lt;/p>
-&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
-&lt;ol>
-&lt;li>Must have &lt;a class="link" href="https://learn.hashicorp.com/tutorials/packer/get-started-install-cli" target="_blank" rel="noopener"
->Packer&lt;/a> configured on your machine, DHCP running on the network, and a Proxmox server available (Preferrable to be version 7.1)&lt;/li>
-&lt;li>Have a Proxmox user created with proper privledges for Terraform (&lt;a class="link" href="https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/" target="_blank" rel="noopener"
->See how to create the user here&lt;/a>)&lt;/li>
-&lt;li>Ubuntu Server 22.04 Iso uploaded to your Proxmox server&lt;/li>
-&lt;/ol>
-&lt;h2 id="getting-proper-files-setup">Getting proper files setup&lt;/h2>
-&lt;p>There are two primary files that will need configured.&lt;/p>
-&lt;p>The first of the two is our credentials.pkr.hcl file. Update all variables within to your own. Any more in-depth configuration can be done within the ubuntu-server-focal.pkr.hcl file.&lt;/p>
-&lt;p>You can generate your token-id and token secret using the following command into your Proxmox Shell &lt;code>pveum user token add terraform-prov@pve terraform-token --privsep=0&lt;/code> Replace terraform-prov@pve with your created username &lt;strong>Write this down because you won&amp;rsquo;t be able to find this access token again later&lt;/strong>&lt;/p>
-&lt;p>&lt;img src="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1.png"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Packer on Cinderblock</title><link>https://cinderblock.github.io/tags/packer/</link><description>Recent content in Packer on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 30 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/tags/packer/index.xml" rel="self" type="application/rss+xml"/><item><title>Packer - Proxmox Ubuntu Server Creation</title><link>https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/</link><pubDate>Sat, 30 Jul 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/</guid><description>&lt;img src="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker.png" alt="Featured image of post Packer - Proxmox Ubuntu Server Creation" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Using Packer to create a Ubunut 22.04 server image within Proxmox. This is designed with Proxmox Virtual Environment version 7.1 in mind.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Packer/Proxmox/packer-iso-ubuntu" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt; at the repository.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Must have &lt;a class="link" href="https://learn.hashicorp.com/tutorials/packer/get-started-install-cli" target="_blank" rel="noopener"
+&gt;Packer&lt;/a&gt; configured on your machine, DHCP running on the network, and a Proxmox server available (Preferrable to be version 7.1)&lt;/li&gt;
+&lt;li&gt;Have a Proxmox user created with proper privledges for Terraform (&lt;a class="link" href="https://www.cinderblock.tech/blog/terraform-proxmox-vm-deploy/" target="_blank" rel="noopener"
+&gt;See how to create the user here&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Ubuntu Server 22.04 Iso uploaded to your Proxmox server&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="getting-proper-files-setup"&gt;Getting proper files setup&lt;/h2&gt;
+&lt;p&gt;There are two primary files that will need configured.&lt;/p&gt;
+&lt;p&gt;The first of the two is our credentials.pkr.hcl file. Update all variables within to your own. Any more in-depth configuration can be done within the ubuntu-server-focal.pkr.hcl file.&lt;/p&gt;
+&lt;p&gt;You can generate your token-id and token secret using the following command into your Proxmox Shell &lt;code&gt;pveum user token add terraform-prov@pve terraform-token --privsep=0&lt;/code&gt; Replace terraform-prov@pve with your created username &lt;strong&gt;Write this down because you won&amp;rsquo;t be able to find this access token again later&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1.png"
 width="760"
 height="168"
-srcset="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1_hu611b113527e9bc21bba385ea7e244286_11142_480x0_resize_box_3.png 480w, https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1_hu611b113527e9bc21bba385ea7e244286_11142_1024x0_resize_box_3.png 1024w"
+srcset="https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1_hu_1b35954b1b46f05a.png 480w, https://cinderblock.github.io/p/packer-proxmox-ubuntu-server-creation/ProxmoxPacker-Example1_hu_775a3dfff5df342c.png 1024w"
 loading="lazy"
 alt="Proxmox-Token-Generate"
 class="gallery-image"
 data-flex-grow="452"
 data-flex-basis="1085px"
->&lt;/p>
-&lt;p>An Example credneitals/pkr.hcl file&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-tf" data-lang="tf">&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_api_url&lt;/span> = &lt;span class="s2">&amp;#34;https://yourProxmox.server:8006/api2/json&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_api_token_id&lt;/span> = &lt;span class="s2">&amp;#34;full-tokenid&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_api_token_secret&lt;/span> = &lt;span class="s2">&amp;#34;tokenValue&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_node&lt;/span> = &lt;span class="s2">&amp;#34;nodeToBuildOn&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_storage_pool&lt;/span> = &lt;span class="s2">&amp;#34;storagePoolToBuildOn&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">pm_storage_pool_type&lt;/span> = &lt;span class="s2">&amp;#34;typeOf-pm_storage_pool&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ssh_username&lt;/span> = &lt;span class="s2">&amp;#34;yourSshUser&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ssh_password&lt;/span> = &lt;span class="s2">&amp;#34;yourSshPassword&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">ssh_private_key_file&lt;/span> = &lt;span class="s2">&amp;#34;~/.ssh/id_rsa&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">vm_name&lt;/span> = &lt;span class="s2">&amp;#34;vm name&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">vm_id&lt;/span> = &lt;span class="s2">&amp;#34;1003&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">iso_file&lt;/span> = &lt;span class="s2">&amp;#34;local:iso/ubuntu-22.04-live-server-amd64.iso&amp;#34;&lt;/span>&lt;span class="c1"> #Iso file location on your proxmox
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>Second file to update to your preference is our user-data.example file. You only need to update the fields beneath user-data, users + passwd, and potentially your timezone.&lt;/p>
-&lt;p>&lt;em>&lt;strong>The passwd fields in cloud-init files must be in a sha-512 hash. Generate a hash using &lt;code>echo passwd | mkpasswd -m sha-512 -s &lt;/code>&lt;/strong>&lt;/em>&lt;/p>
-&lt;p>An Example user-data file&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c">#cloud-config&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">autoinstall&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">locale&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">en_US&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">keyboard&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">layout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">en&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ssh&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">install-server&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">allow-pw&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">disable_root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ssh_quiet_keygen&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">allow_public_ssh_keys&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">packages&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">qemu-guest-agent&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">sudo&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">storage&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">layout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">direct&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">swap&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">size&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">user-data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">package_upgrade&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">timezone&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">America/New_York&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">users&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">username-here&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">groups&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">adm, sudo]&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">lock-passwd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">sudo&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ALL=(ALL) NOPASSWD:ALL&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">shell&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/bin/bash&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># passwd: your-password&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># - or -&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># ssh_authorized_keys:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># - your-ssh-key&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="finally-the-packer-process">Finally, the Packer Process&lt;/h2>
-&lt;p>First thing we should do prior to going further, is double check the valiation of our Packer files. Otherwise we could have some major headache.&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;p>cd into the project directory (./ubuntu-server-focal), and run &lt;code>packer validate -var-file='..\credentials.pkr.hcl' .\ubuntu-server-focal.pkr.hcl&lt;/code>&lt;/p>
-&lt;ul>
-&lt;li>If any errors show up, you&amp;rsquo;ll have to fix them before moving on&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;p>Once we have confirmed everything appears correct, we can run the build, cross our fingers, and it should work.&lt;/p>
-&lt;ol start="2">
-&lt;li>Build the image (Within the same project directory where you ran the validate), &lt;code>packer build -var-file='..\credentials.pkr.hcl' .\ubuntu-server-focal.pkr.hcl&lt;/code>&lt;/li>
-&lt;/ol>
-&lt;h2 id="useful-resources">Useful Resources&lt;/h2>
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" target="_blank" rel="noopener"
->Terraform Provider for Proxmox&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" target="_blank" rel="noopener"
->Proxmmox User Creation Guide&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://learn.hashicorp.com/packer" target="_blank" rel="noopener"
->Packer Tutoritals&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted -->
-To complete this project, 3 steps are taken.&lt;/p>
-&lt;ol>
-&lt;li>Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt&lt;/li>
-&lt;li>Use Terraform to deploy 4 virtual machines into a vSphere environment&lt;/li>
-&lt;li>Use Ansible to configure these 4 virtual machines as desired&lt;/li>
-&lt;/ol>
-&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/vSphere/vSphere-WinServ-Deployment" target="_blank" rel="noopener"
->GitHub (vSphere-WinServ-Deployment)&lt;/a> at the repository!&lt;/strong>&lt;/p>
-&lt;h2 id="1-packers-role">1. Packer&amp;rsquo;s Role:&lt;/h2>
-&lt;p>Create a Windows Server 2022 .iso that is updated and has VMTools installed by default using &lt;a class="link" href="https://www.packer.io/" target="_blank" rel="noopener"
->Packer&lt;/a>. In this solution, it will be geared to usage with vSphere, a VMware product.&lt;/p>
-&lt;p>&lt;strong>First: Packer uses &lt;code>autounattend.xml&lt;/code> and &lt;code>sysprep-autounattend.xml&lt;/code> to automate Windows Settings&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>It pulls Windows Server 2022 Datacenter Eval Edition (Desktop Experience) from Microsoft&amp;rsquo;s site&lt;/li>
-&lt;li>Installs &amp;amp; configure OpenSSH Client &amp;amp; Server for remote connection&lt;/li>
-&lt;li>Installs VMware tools from ISO provided from the build ESX server&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>Packer Provisioner Steps&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>Updating OS via Windows Update&lt;/li>
-&lt;li>Doing some OS adjustments
-&lt;ul>
-&lt;li>Set Windows telemetry settings to minimum&lt;/li>
-&lt;li>Show file extentions by default&lt;/li>
-&lt;li>Install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
->Chocolatey&lt;/a> - a Windows package manager
-&lt;ul>
-&lt;li>Install Microsoft Edge (Chromium)&lt;/li>
-&lt;li>Install Win32-OpenSSH-Server&lt;/li>
-&lt;li>Install PowerShell Core&lt;/li>
-&lt;li>Install 7-Zip&lt;/li>
-&lt;li>Install Notepad++&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Enable Powershell-Core (&lt;code>pwsh&lt;/code>) to be the default SSHD shell&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Cleanup tasks&lt;/li>
-&lt;li>Remove CDROM drives from VM template (otherwise there would be 2)&lt;/li>
-&lt;/ul>
-&lt;h2 id="2-terraforms-role">2. Terraform&amp;rsquo;s Role:&lt;/h2>
-&lt;p>Main role: Deploy the Virtual Machines&lt;/p>
-&lt;ul>
-&lt;li>Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare)
-&lt;ul>
-&lt;li>Using the vSphere provider:
-&lt;ul>
-&lt;li>Assign appropriate resources to each machine&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Once prepared with appropriate values and the networking is in place:
-&lt;ul>
-&lt;li>Navigate to the Terraform directory and run these commands&lt;/li>
-&lt;li>&lt;code>terraform init&lt;/code> Pull proper Terraform providers and modules used&lt;/li>
-&lt;li>&lt;code>terraform validate&lt;/code> This will return whether the configuration is valid or not&lt;/li>
-&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code> Actually apply the configuration&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="terraform-variable-files">Terraform Variable files&lt;/h2>
-&lt;ul>
-&lt;li>&lt;em>variables.tf&lt;/em>
-&lt;ul>
-&lt;li>Declare variables that will be used with the Terraform configuration&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>terraform.tfvars&lt;/em>
-&lt;ul>
-&lt;li>Assign variables that will be used with the Terraform configuration&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="3-ansibles-role">3. Ansible&amp;rsquo;s Role:&lt;/h2>
-&lt;p>Main role: Configure the deployed Virtual Machines.&lt;/p>
-&lt;ul>
-&lt;li>Setup Windows Server Feature: Domain
-&lt;ul>
-&lt;li>Primary Domain Controller&lt;/li>
-&lt;li>Replica Domain Controller&lt;/li>
-&lt;li>Auto-Join the Virutal Machines to the respective Domain created&lt;/li>
-&lt;li>Create a few users and groups within Active Directory&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Setup Windows Ssrver Feature: DHCP
-&lt;ul>
-&lt;li>Setup DHCP Scope&lt;/li>
-&lt;li>Authorize it to the Domain.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Setup Windows Server Feature: File Sharing
-&lt;ul>
-&lt;li>Create two shares
-&lt;ul>
-&lt;li>An employee share and administrator share. These shares are assigned group permissions.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Common Configurations
-&lt;ul>
-&lt;li>Enable RDP and allow it through the firewall on all windows servers created&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2 id="ansible-variable-files">Ansible Variable files&lt;/h2>
-&lt;ul>
-&lt;li>&lt;em>inventory.yml&lt;/em>
-&lt;ul>
-&lt;li>Modify hosts associated with the playbook. Assign the IP addressing.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>winlab.yml&lt;/em>
-&lt;ul>
-&lt;li>Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li>
-&lt;li>These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>ansible.cfg&lt;/em>
-&lt;ul>
-&lt;li>Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;em>./group_vars/all.yml&lt;/em>
-&lt;ul>
-&lt;li>Contains specific variable information used within the ./roles/* Ansible code.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="prerequisites">Prerequisites&lt;/h1>
-&lt;ul>
-&lt;li>Linux machine with the following
-&lt;ul>
-&lt;li>Ansible
-&lt;ul>
-&lt;li>&lt;code>sudo apt update&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt install software-properties-common&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo add-apt-repository --yes --update ppa:ansible/ansible&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt install ansible&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Terraform
-&lt;ul>
-&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install -y gnupg software-properties-common curl&lt;/code>&lt;/li>
-&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install terraform&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Packer
-&lt;ul>
-&lt;li>&lt;code>curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code>&lt;/li>
-&lt;li>&lt;code>sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install packer&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Git
-&lt;ul>
-&lt;li>&lt;code>sudo apt-get install git&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>A Code Interprester
-&lt;ul>
-&lt;li>I recommend &lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
->Visual-Studio-Code&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>vSphere Lab Environment
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://www.vmware.com/products/vsphere.html" target="_blank" rel="noopener"
->vSphere&lt;/a> &amp;mdash; &lt;em>Note: This project is using vSphere version 7.0.0&lt;/em>
-&lt;!-- raw HTML omitted -->&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="packer">Packer&lt;/h1>
-&lt;h2 id="navigate-to-packer-directory">Navigate to Packer Directory&lt;/h2>
-&lt;ul>
-&lt;li>First setup Packer environment
-&lt;ul>
-&lt;li>&lt;code>packer init -upgrade ws2022.pkr.hcl&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Then apply the Packer configuration to create the Windows Server 2022 Image
-&lt;ul>
-&lt;li>&lt;code>packer build -timestamp-ui -force -var-file=myvarfile.json ws2022.pkr.hcl&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;ul>
-&lt;li>This packer execute pulls the newest windows server datacenter 2022 eval .iso from microsoft populates it into the vSphere environment, in the specified datacenter/cluster/host/datastore&lt;/li>
-&lt;li>It then runs commands to: Grab DHCP, Updates the image, Enables SSH, Enables RDP, Configures necessary firewall settings, sets passwords/usernames, &amp;amp; installs VMware Tools to base image&lt;/li>
-&lt;li>Additionally, it will install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
->Chocolatey&lt;/a> for packages, notepad++, Edge, &amp;amp; 7-zip
-&lt;!-- raw HTML omitted -->&lt;/li>
-&lt;/ul>
-&lt;h2 id="after-packer-finishes">After Packer Finishes&lt;/h2>
-&lt;h6 id="roughly-an-hour-depending-on-processing-and-internet-speed">&lt;em>Roughly an hour depending on processing and internet speed&lt;/em>&lt;/h6>
-&lt;ul>
-&lt;li>Go into your vSphere and turn the resulting VM into a Template
-&lt;ul>
-&lt;li>Ensure this mimics the variables you have set in the terraform.tfvars file. This will be our next step.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="terraform">Terraform&lt;/h1>
-&lt;h2 id="navigate-to-terraform-directory">Navigate to Terraform Directory&lt;/h2>
-&lt;ul>
-&lt;li>Setup Terraform Environemnt
-&lt;ul>
-&lt;li>&lt;code>terraform init&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Format terraform to ensure it meets criteria required
-&lt;ul>
-&lt;li>&lt;code>terraform fmt&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Do a terraform plan to detect any potential errors in code and to see potential end result. Read over this
-&lt;ul>
-&lt;li>&lt;code>terraform plan&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Finally, if all the above appears correct, perform a terraform apply
-&lt;ul>
-&lt;li>&lt;code>terraform apply&lt;/code> &amp;hellip; &lt;code>yes&lt;/code>
-&lt;ul>
-&lt;li>This may take awhile, once it is done, double check in vSphere all necessary Virtual Machines were created properly &lt;em>(For me this took 20 minutes to fully complete)&lt;/em>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="ansible">Ansible&lt;/h1>
-&lt;h2 id="navigate-to-ansible-directory">Navigate to Ansible Directory&lt;/h2>
-&lt;ul>
-&lt;li>Once you have allowed Terraform to finish its configuraiton:
-&lt;ul>
-&lt;li>Navigate to your Ansible Directory, &lt;code>cd &amp;lt;path-to-Ansible&amp;gt;&lt;/code>&lt;/li>
-&lt;li>Run your ansible playbook &lt;code>ansible-playbook winlab.yml&lt;/code>
-&lt;ul>
-&lt;li>This should run through and detail each change as it plays out&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h1 id="references-useduseful-links">References Used/Useful Links&lt;/h1>
-&lt;h3 id="i-sourced-various-code-and-peices-of-information-from-the-following-git-repositories">I sourced various code and peices of information from the following Git Repositories&lt;/h3>
-&lt;ul>
-&lt;li>Stefan Zimmermann &lt;a class="link" href="https://gitlab.com/StefanZ8n/packer-ws2022" target="_blank" rel="noopener"
->GitLab&lt;/a> &lt;a class="link" href="https://z8n.eu/2021/11/09/building-a-windows-server-2022-ova-with-packer/" target="_blank" rel="noopener"
->Article&lt;/a>&lt;/li>
-&lt;li>Dmitry Teslya &lt;a class="link" href="https://github.com/dteslya/win-iac-lab" target="_blank" rel="noopener"
->GitHub&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h3 id="useful-places-for-refernece">Useful places for refernece&lt;/h3>
-&lt;ul>
-&lt;li>Tutorials for Terraform, Packer, and others &lt;a class="link" href="https://learn.hashicorp.com/search?query=Packer" target="_blank" rel="noopener"
->Hashicorp-Tutorials&lt;/a>&lt;/li>
-&lt;li>Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
->Documentation&lt;/a>
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
->Windows-Modules&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
->Documentation&lt;/a>&lt;/li>
-&lt;li>Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
->Documentation&lt;/a>&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&gt;&lt;/p&gt;
+&lt;p&gt;An Example credneitals/pkr.hcl file&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-tf" data-lang="tf"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pm_api_url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;https://yourProxmox.server:8006/api2/json&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pm_api_token_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;full-tokenid&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pm_api_token_secret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;tokenValue&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pm_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;nodeToBuildOn&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pm_storage_pool&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;storagePoolToBuildOn&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pm_storage_pool_type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;typeOf-pm_storage_pool&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;ssh_username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;yourSshUser&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;ssh_password&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;yourSshPassword&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;ssh_private_key_file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;~/.ssh/id_rsa&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;vm_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;vm name&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;vm_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;1003&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;iso_file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;local:iso/ubuntu-22.04-live-server-amd64.iso&amp;#34;&lt;/span&gt;&lt;span class="c1"&gt; #Iso file location on your proxmox
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Second file to update to your preference is our user-data.example file. You only need to update the fields beneath user-data, users + passwd, and potentially your timezone.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;The passwd fields in cloud-init files must be in a sha-512 hash. Generate a hash using &lt;code&gt;echo passwd | mkpasswd -m sha-512 -s &lt;/code&gt;&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;An Example user-data file&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;#cloud-config&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;autoinstall&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;locale&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;en_US&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;keyboard&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;layout&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;en&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ssh&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;install-server&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;allow-pw&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;disable_root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ssh_quiet_keygen&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;allow_public_ssh_keys&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;packages&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;qemu-guest-agent&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;sudo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;storage&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;layout&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;direct&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;swap&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;size&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;user-data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;package_upgrade&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;timezone&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;America/New_York&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;users&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;username-here&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;groups&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="l"&gt;adm, sudo]&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;lock-passwd&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;sudo&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;ALL=(ALL) NOPASSWD:ALL&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;shell&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;/bin/bash&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# passwd: your-password&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# - or -&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# ssh_authorized_keys:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# - your-ssh-key&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="finally-the-packer-process"&gt;Finally, the Packer Process&lt;/h2&gt;
+&lt;p&gt;First thing we should do prior to going further, is double check the valiation of our Packer files. Otherwise we could have some major headache.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;cd into the project directory (./ubuntu-server-focal), and run &lt;code&gt;packer validate -var-file='..\credentials.pkr.hcl' .\ubuntu-server-focal.pkr.hcl&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;If any errors show up, you&amp;rsquo;ll have to fix them before moving on&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Once we have confirmed everything appears correct, we can run the build, cross our fingers, and it should work.&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Build the image (Within the same project directory where you ran the validate), &lt;code&gt;packer build -var-file='..\credentials.pkr.hcl' .\ubuntu-server-focal.pkr.hcl&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="useful-resources"&gt;Useful Resources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" target="_blank" rel="noopener"
+&gt;Terraform Provider for Proxmox&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://registry.terraform.io/providers/Telmate/proxmox/latest/docs" target="_blank" rel="noopener"
+&gt;Proxmmox User Creation Guide&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.hashicorp.com/packer" target="_blank" rel="noopener"
+&gt;Packer Tutoritals&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Terraform - vSphere Windows Server Deployment</title><link>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</link><pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/</guid><description>&lt;img src="https://cinderblock.github.io/p/terraform-vsphere-windows-server-deployment/vSphereBanner.png" alt="Featured image of post Terraform - vSphere Windows Server Deployment" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;The goal of this project is to deploy a ready-to-go windows server environment. This includes a domain controller, a replica domain controller, a DHCP server, and a fileserver. Additionally setting up users, groups, and OUs for the respective users within the domain. &lt;!-- raw HTML omitted --&gt;
+To complete this project, 3 steps are taken.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Use Packer to spin up a sys prepped and fully updated windows server 2022 iso for the environemnt&lt;/li&gt;
+&lt;li&gt;Use Terraform to deploy 4 virtual machines into a vSphere environment&lt;/li&gt;
+&lt;li&gt;Use Ansible to configure these 4 virtual machines as desired&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox/tree/main/Terraform/vSphere/vSphere-WinServ-Deployment" target="_blank" rel="noopener"
+&gt;GitHub (vSphere-WinServ-Deployment)&lt;/a&gt; at the repository!&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id="1-packers-role"&gt;1. Packer&amp;rsquo;s Role:&lt;/h2&gt;
+&lt;p&gt;Create a Windows Server 2022 .iso that is updated and has VMTools installed by default using &lt;a class="link" href="https://www.packer.io/" target="_blank" rel="noopener"
+&gt;Packer&lt;/a&gt;. In this solution, it will be geared to usage with vSphere, a VMware product.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;First: Packer uses &lt;code&gt;autounattend.xml&lt;/code&gt; and &lt;code&gt;sysprep-autounattend.xml&lt;/code&gt; to automate Windows Settings&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It pulls Windows Server 2022 Datacenter Eval Edition (Desktop Experience) from Microsoft&amp;rsquo;s site&lt;/li&gt;
+&lt;li&gt;Installs &amp;amp; configure OpenSSH Client &amp;amp; Server for remote connection&lt;/li&gt;
+&lt;li&gt;Installs VMware tools from ISO provided from the build ESX server&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Packer Provisioner Steps&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Updating OS via Windows Update&lt;/li&gt;
+&lt;li&gt;Doing some OS adjustments
+&lt;ul&gt;
+&lt;li&gt;Set Windows telemetry settings to minimum&lt;/li&gt;
+&lt;li&gt;Show file extentions by default&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+&gt;Chocolatey&lt;/a&gt; - a Windows package manager
+&lt;ul&gt;
+&lt;li&gt;Install Microsoft Edge (Chromium)&lt;/li&gt;
+&lt;li&gt;Install Win32-OpenSSH-Server&lt;/li&gt;
+&lt;li&gt;Install PowerShell Core&lt;/li&gt;
+&lt;li&gt;Install 7-Zip&lt;/li&gt;
+&lt;li&gt;Install Notepad++&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Enable Powershell-Core (&lt;code&gt;pwsh&lt;/code&gt;) to be the default SSHD shell&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Cleanup tasks&lt;/li&gt;
+&lt;li&gt;Remove CDROM drives from VM template (otherwise there would be 2)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-terraforms-role"&gt;2. Terraform&amp;rsquo;s Role:&lt;/h2&gt;
+&lt;p&gt;Main role: Deploy the Virtual Machines&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup the four Windows Servers (Primary Domain Controller, Replica Domain Controller, DHCP, Fileshare)
+&lt;ul&gt;
+&lt;li&gt;Using the vSphere provider:
+&lt;ul&gt;
+&lt;li&gt;Assign appropriate resources to each machine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Once prepared with appropriate values and the networking is in place:
+&lt;ul&gt;
+&lt;li&gt;Navigate to the Terraform directory and run these commands&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;terraform init&lt;/code&gt; Pull proper Terraform providers and modules used&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;terraform validate&lt;/code&gt; This will return whether the configuration is valid or not&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;terraform apply&lt;/code&gt; &amp;hellip; &lt;code&gt;yes&lt;/code&gt; Actually apply the configuration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="terraform-variable-files"&gt;Terraform Variable files&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;variables.tf&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Declare variables that will be used with the Terraform configuration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;terraform.tfvars&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Assign variables that will be used with the Terraform configuration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-ansibles-role"&gt;3. Ansible&amp;rsquo;s Role:&lt;/h2&gt;
+&lt;p&gt;Main role: Configure the deployed Virtual Machines.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup Windows Server Feature: Domain
+&lt;ul&gt;
+&lt;li&gt;Primary Domain Controller&lt;/li&gt;
+&lt;li&gt;Replica Domain Controller&lt;/li&gt;
+&lt;li&gt;Auto-Join the Virutal Machines to the respective Domain created&lt;/li&gt;
+&lt;li&gt;Create a few users and groups within Active Directory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Setup Windows Ssrver Feature: DHCP
+&lt;ul&gt;
+&lt;li&gt;Setup DHCP Scope&lt;/li&gt;
+&lt;li&gt;Authorize it to the Domain.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Setup Windows Server Feature: File Sharing
+&lt;ul&gt;
+&lt;li&gt;Create two shares
+&lt;ul&gt;
+&lt;li&gt;An employee share and administrator share. These shares are assigned group permissions.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Common Configurations
+&lt;ul&gt;
+&lt;li&gt;Enable RDP and allow it through the firewall on all windows servers created&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="ansible-variable-files"&gt;Ansible Variable files&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;inventory.yml&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Modify hosts associated with the playbook. Assign the IP addressing.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;winlab.yml&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Associate &amp;lsquo;roles&amp;rsquo; to the hosts identified in the inventory file.&lt;/li&gt;
+&lt;li&gt;These &amp;lsquo;roles&amp;rsquo; are folders within the directory containing a set of code to configure per host&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;ansible.cfg&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Tells ansible variable information. In this scenario, identifies to use inventory.yml file.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;./group_vars/all.yml&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;Contains specific variable information used within the ./roles/* Ansible code.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="prerequisites"&gt;Prerequisites&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux machine with the following
+&lt;ul&gt;
+&lt;li&gt;Ansible
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo apt update&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt install software-properties-common&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo add-apt-repository --yes --update ppa:ansible/ansible&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt install ansible&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Terraform
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install -y gnupg software-properties-common curl&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install terraform&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Packer
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-add-repository &amp;quot;deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get update &amp;amp;&amp;amp; sudo apt-get install packer&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Git
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sudo apt-get install git&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;A Code Interprester
+&lt;ul&gt;
+&lt;li&gt;I recommend &lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
+&gt;Visual-Studio-Code&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;vSphere Lab Environment
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.vmware.com/products/vsphere.html" target="_blank" rel="noopener"
+&gt;vSphere&lt;/a&gt; &amp;mdash; &lt;em&gt;Note: This project is using vSphere version 7.0.0&lt;/em&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="packer"&gt;Packer&lt;/h1&gt;
+&lt;h2 id="navigate-to-packer-directory"&gt;Navigate to Packer Directory&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;First setup Packer environment
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;packer init -upgrade ws2022.pkr.hcl&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Then apply the Packer configuration to create the Windows Server 2022 Image
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;packer build -timestamp-ui -force -var-file=myvarfile.json ws2022.pkr.hcl&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;This packer execute pulls the newest windows server datacenter 2022 eval .iso from microsoft populates it into the vSphere environment, in the specified datacenter/cluster/host/datastore&lt;/li&gt;
+&lt;li&gt;It then runs commands to: Grab DHCP, Updates the image, Enables SSH, Enables RDP, Configures necessary firewall settings, sets passwords/usernames, &amp;amp; installs VMware Tools to base image&lt;/li&gt;
+&lt;li&gt;Additionally, it will install &lt;a class="link" href="https://chocolatey.org/" target="_blank" rel="noopener"
+&gt;Chocolatey&lt;/a&gt; for packages, notepad++, Edge, &amp;amp; 7-zip
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="after-packer-finishes"&gt;After Packer Finishes&lt;/h2&gt;
+&lt;h6 id="roughly-an-hour-depending-on-processing-and-internet-speed"&gt;&lt;em&gt;Roughly an hour depending on processing and internet speed&lt;/em&gt;&lt;/h6&gt;
+&lt;ul&gt;
+&lt;li&gt;Go into your vSphere and turn the resulting VM into a Template
+&lt;ul&gt;
+&lt;li&gt;Ensure this mimics the variables you have set in the terraform.tfvars file. This will be our next step.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="terraform"&gt;Terraform&lt;/h1&gt;
+&lt;h2 id="navigate-to-terraform-directory"&gt;Navigate to Terraform Directory&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup Terraform Environemnt
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform init&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Format terraform to ensure it meets criteria required
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform fmt&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Do a terraform plan to detect any potential errors in code and to see potential end result. Read over this
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform plan&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Finally, if all the above appears correct, perform a terraform apply
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;terraform apply&lt;/code&gt; &amp;hellip; &lt;code&gt;yes&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;This may take awhile, once it is done, double check in vSphere all necessary Virtual Machines were created properly &lt;em&gt;(For me this took 20 minutes to fully complete)&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="ansible"&gt;Ansible&lt;/h1&gt;
+&lt;h2 id="navigate-to-ansible-directory"&gt;Navigate to Ansible Directory&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Once you have allowed Terraform to finish its configuraiton:
+&lt;ul&gt;
+&lt;li&gt;Navigate to your Ansible Directory, &lt;code&gt;cd &amp;lt;path-to-Ansible&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Run your ansible playbook &lt;code&gt;ansible-playbook winlab.yml&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;This should run through and detail each change as it plays out&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="references-useduseful-links"&gt;References Used/Useful Links&lt;/h1&gt;
+&lt;h3 id="i-sourced-various-code-and-peices-of-information-from-the-following-git-repositories"&gt;I sourced various code and peices of information from the following Git Repositories&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Stefan Zimmermann &lt;a class="link" href="https://gitlab.com/StefanZ8n/packer-ws2022" target="_blank" rel="noopener"
+&gt;GitLab&lt;/a&gt; &lt;a class="link" href="https://z8n.eu/2021/11/09/building-a-windows-server-2022-ova-with-packer/" target="_blank" rel="noopener"
+&gt;Article&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Dmitry Teslya &lt;a class="link" href="https://github.com/dteslya/win-iac-lab" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="useful-places-for-refernece"&gt;Useful places for refernece&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Tutorials for Terraform, Packer, and others &lt;a class="link" href="https://learn.hashicorp.com/search?query=Packer" target="_blank" rel="noopener"
+&gt;Hashicorp-Tutorials&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Ansible &lt;a class="link" href="https://docs.ansible.com/" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://galaxy.ansible.com/ansible/windows?extIdCarryOver=true&amp;amp;sc_cid=701f2000001OH7YAAW" target="_blank" rel="noopener"
+&gt;Windows-Modules&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Terraform &lt;a class="link" href="https://www.terraform.io/docs" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Packer &lt;a class="link" href="https://www.packer.io/docs" target="_blank" rel="noopener"
+&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

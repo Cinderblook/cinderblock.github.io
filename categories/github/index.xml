@@ -1,303 +1,303 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GitHub on Cinderblock</title><link>https://cinderblock.github.io/categories/github/</link><description>Recent content in GitHub on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 01 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/github/index.xml" rel="self" type="application/rss+xml"/><item><title>TackleBox - GitHub Mega Repo</title><link>https://cinderblock.github.io/p/tacklebox-github-mega-repo/</link><pubDate>Mon, 01 May 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/tacklebox-github-mega-repo/</guid><description>&lt;img src="https://cinderblock.github.io/p/tacklebox-github-mega-repo/TackleboxGitHub.png" alt="Featured image of post TackleBox - GitHub Mega Repo" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Welcome to the TackleBox, my repository that houses a diverse collection of projects and scripts.&lt;/p>
-&lt;p>&lt;strong>Check out all the goodies in this repo on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox" target="_blank" rel="noopener"
->GitHub&lt;/a>.&lt;/strong>&lt;/p>
-&lt;h2 id="a-quick-peek">A Quick Peek&lt;/h2>
-&lt;p>Greetings, fellow tech enthusiasts! I thought it would be a great idea to showcase the mishmash of projects and scripts I&amp;rsquo;ve accumulated in this repository of mine, aptly named the TackleBox. Within this repository, you&amp;rsquo;ll find a wide range of content, from network automation scripts using PowerShell and Ansible to infrastructure-as-code solutions with Packer and Terraform. I also explore various mini-projects involving Docker containers and dabble in the world of Kubernetes.&lt;/p>
-&lt;p>As someone who constantly seeks ways to streamline my workflow and simplify my life, I realized that the best approach would be to create a well-organized repository containing thorough documentation and useful scripts that I create along the way.&lt;/p>
-&lt;p>So please, take a look around, and you might discover something valuable: &lt;a class="link" href="https://github.com/Cinderblook/tacklebox" target="_blank" rel="noopener"
->TackleBox - GitHub&lt;/a>&lt;/p></description></item><item><title>Hugo GitPage - Creating a free website</title><link>https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/</link><pubDate>Sat, 08 Oct 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/</guid><description>&lt;img src="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/FreeHugoSiteGitPages.png" alt="Featured image of post Hugo GitPage - Creating a free website" />&lt;h1 id="overview">Overview&lt;/h1>
-&lt;p>Using Github pages, Github actions, and Hugo to create a static website for free.&lt;/p>
-&lt;p>&lt;strong>Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/cinderblook.github.io" target="_blank" rel="noopener"
->GitHub&lt;/a> at the repository.&lt;/strong>&lt;/p>
-&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
-&lt;ul>
-&lt;li>Have a Domain name purchased (Will be demonstrating CloudFlare in this guide)&lt;/li>
-&lt;li>Have a GitHub Account&lt;/li>
-&lt;/ul>
-&lt;h2 id="steps">Steps&lt;/h2>
-&lt;ol>
-&lt;li>Create a Public Repository&lt;/li>
-&lt;li>Change Repository settings
-&lt;ol>
-&lt;li>Custom Domain Name (Optional)&lt;/li>
-&lt;/ol>
-&lt;/li>
-&lt;li>Setup Hugo&lt;/li>
-&lt;li>Picking a Theme&lt;/li>
-&lt;li>Commit&lt;/li>
-&lt;/ol>
-&lt;h2 id="create-a-public-repository">Create a Public Repository&lt;/h2>
-&lt;p>Go ahead and create a new repository. It is important that it is named something like &lt;code>example.github.io&lt;/code>&lt;/p>
-&lt;p>Next, navigate into the .github/workflows/ folder created by default. Create a file named &lt;code>example.yml&lt;/code> (&lt;em>This should be the name as the &lt;code>example.github.io&lt;/code>&lt;/em>)&lt;/p>
-&lt;p>Add the following to the &lt;code>example.yml&lt;/code> file&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;span class="lnt">34
-&lt;/span>&lt;span class="lnt">35
-&lt;/span>&lt;span class="lnt">36
-&lt;/span>&lt;span class="lnt">37
-&lt;/span>&lt;span class="lnt">38
-&lt;/span>&lt;span class="lnt">39
-&lt;/span>&lt;span class="lnt">40
-&lt;/span>&lt;span class="lnt">41
-&lt;/span>&lt;span class="lnt">42
-&lt;/span>&lt;span class="lnt">43
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">github pages&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">push&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">main &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Set a branch to deploy&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pull_request&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">deploy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-20.04&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v2&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">submodules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Fetch Hugo themes (true OR recursive)&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">fetch-depth&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Fetch all history for .GitInfo and .Lastmod&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup Node&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/setup-node@v2&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">node-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;14&amp;#39;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install dependencies&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> npm install postcss -D
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> npm install -g postcss-cli
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> npm install -g autoprefixer
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> &lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup Hugo&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-hugo@v2&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hugo-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;latest&amp;#39;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># extended: true&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">npm i &amp;amp;&amp;amp; hugo -D --gc&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c">#hugo --minify&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-gh-pages@v3&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c">#if: github.ref == &amp;#39;refs/heads/master&amp;#39;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">github_token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.SECRET_HUGO }}&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">publish_dir&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./public&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>This will setup the GitHub page to build an environment that will support Hugo rather than the default GitHub pages service used Jekyll. The lines that run npm commands are additional, although necessary for some themes in order to run specific cross site scripts.&lt;/p>
-&lt;p>The github_token: ${{ secrets.SECRET_HUGO }} will be set under the Secrets -&amp;gt; Actions tab&lt;/p>
-&lt;h2 id="change-repository-settings">Change Repository Settings&lt;/h2>
-&lt;p>Go to the settings in the repository&lt;/p>
-&lt;ol>
-&lt;li>Create a new branch - I use &lt;code>gh-pages&lt;/code>&lt;/li>
-&lt;li>Under Pages tab
-&lt;ul>
-&lt;li>Under Build and Deployment -&amp;gt; Change source to Deploy from a branch and Branch to &lt;code>gh-pages&lt;/code>&lt;/li>
-&lt;li>(Optional) Change custom domain name to your purchased domain name&lt;/li>
-&lt;li>&lt;img src="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample1.png"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GitHub on Cinderblock</title><link>https://cinderblock.github.io/categories/github/</link><description>Recent content in GitHub on Cinderblock</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 01 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://cinderblock.github.io/categories/github/index.xml" rel="self" type="application/rss+xml"/><item><title>TackleBox - GitHub Mega Repo</title><link>https://cinderblock.github.io/p/tacklebox-github-mega-repo/</link><pubDate>Mon, 01 May 2023 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/tacklebox-github-mega-repo/</guid><description>&lt;img src="https://cinderblock.github.io/p/tacklebox-github-mega-repo/TackleboxGitHub.png" alt="Featured image of post TackleBox - GitHub Mega Repo" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Welcome to the TackleBox, my repository that houses a diverse collection of projects and scripts.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Check out all the goodies in this repo on &lt;a class="link" href="https://github.com/Cinderblook/tacklebox" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt;.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id="a-quick-peek"&gt;A Quick Peek&lt;/h2&gt;
+&lt;p&gt;Greetings, fellow tech enthusiasts! I thought it would be a great idea to showcase the mishmash of projects and scripts I&amp;rsquo;ve accumulated in this repository of mine, aptly named the TackleBox. Within this repository, you&amp;rsquo;ll find a wide range of content, from network automation scripts using PowerShell and Ansible to infrastructure-as-code solutions with Packer and Terraform. I also explore various mini-projects involving Docker containers and dabble in the world of Kubernetes.&lt;/p&gt;
+&lt;p&gt;As someone who constantly seeks ways to streamline my workflow and simplify my life, I realized that the best approach would be to create a well-organized repository containing thorough documentation and useful scripts that I create along the way.&lt;/p&gt;
+&lt;p&gt;So please, take a look around, and you might discover something valuable: &lt;a class="link" href="https://github.com/Cinderblook/tacklebox" target="_blank" rel="noopener"
+&gt;TackleBox - GitHub&lt;/a&gt;&lt;/p&gt;</description></item><item><title>Hugo GitPage - Creating a free website</title><link>https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/</link><pubDate>Sat, 08 Oct 2022 00:00:00 +0000</pubDate><guid>https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/</guid><description>&lt;img src="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/FreeHugoSiteGitPages.png" alt="Featured image of post Hugo GitPage - Creating a free website" /&gt;&lt;h1 id="overview"&gt;Overview&lt;/h1&gt;
+&lt;p&gt;Using Github pages, Github actions, and Hugo to create a static website for free.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Check out all of the configuration files on &lt;a class="link" href="https://github.com/Cinderblook/cinderblook.github.io" target="_blank" rel="noopener"
+&gt;GitHub&lt;/a&gt; at the repository.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Have a Domain name purchased (Will be demonstrating CloudFlare in this guide)&lt;/li&gt;
+&lt;li&gt;Have a GitHub Account&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="steps"&gt;Steps&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Create a Public Repository&lt;/li&gt;
+&lt;li&gt;Change Repository settings
+&lt;ol&gt;
+&lt;li&gt;Custom Domain Name (Optional)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Setup Hugo&lt;/li&gt;
+&lt;li&gt;Picking a Theme&lt;/li&gt;
+&lt;li&gt;Commit&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="create-a-public-repository"&gt;Create a Public Repository&lt;/h2&gt;
+&lt;p&gt;Go ahead and create a new repository. It is important that it is named something like &lt;code&gt;example.github.io&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Next, navigate into the .github/workflows/ folder created by default. Create a file named &lt;code&gt;example.yml&lt;/code&gt; (&lt;em&gt;This should be the name as the &lt;code&gt;example.github.io&lt;/code&gt;&lt;/em&gt;)&lt;/p&gt;
+&lt;p&gt;Add the following to the &lt;code&gt;example.yml&lt;/code&gt; file&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;span class="lnt"&gt;43
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;github pages&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;push&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;branches&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;main &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Set a branch to deploy&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;pull_request&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;jobs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;deploy&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;runs-on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;ubuntu-20.04&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;steps&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/checkout@v2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;submodules&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Fetch Hugo themes (true OR recursive)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;fetch-depth&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Fetch all history for .GitInfo and .Lastmod&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Setup Node&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/setup-node@v2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;node-version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;14&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Install dependencies&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; npm install postcss -D
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; npm install -g postcss-cli
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; npm install -g autoprefixer
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Setup Hugo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;peaceiris/actions-hugo@v2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;hugo-version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;latest&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# extended: true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Build&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;npm i &amp;amp;&amp;amp; hugo -D --gc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#hugo --minify&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deploy&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;peaceiris/actions-gh-pages@v3&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;#if: github.ref == &amp;#39;refs/heads/master&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;github_token&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;${{ secrets.SECRET_HUGO }}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;publish_dir&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;./public&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;This will setup the GitHub page to build an environment that will support Hugo rather than the default GitHub pages service used Jekyll. The lines that run npm commands are additional, although necessary for some themes in order to run specific cross site scripts.&lt;/p&gt;
+&lt;p&gt;The github_token: ${{ secrets.SECRET_HUGO }} will be set under the Secrets -&amp;gt; Actions tab&lt;/p&gt;
+&lt;h2 id="change-repository-settings"&gt;Change Repository Settings&lt;/h2&gt;
+&lt;p&gt;Go to the settings in the repository&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create a new branch - I use &lt;code&gt;gh-pages&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Under Pages tab
+&lt;ul&gt;
+&lt;li&gt;Under Build and Deployment -&amp;gt; Change source to Deploy from a branch and Branch to &lt;code&gt;gh-pages&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;(Optional) Change custom domain name to your purchased domain name&lt;/li&gt;
+&lt;li&gt;&lt;img src="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample1.png"
 width="796"
 height="500"
-srcset="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample1_hu6b90ebd1510d2dee9789247b12208f7f_37908_480x0_resize_box_3.png 480w, https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample1_hu6b90ebd1510d2dee9789247b12208f7f_37908_1024x0_resize_box_3.png 1024w"
+srcset="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample1_hu_9be7d25cd2999e2f.png 480w, https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample1_hu_7d97f8862b1f8717.png 1024w"
 loading="lazy"
 alt="Pages Settings"
 class="gallery-image"
 data-flex-grow="159"
 data-flex-basis="382px"
->&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;h3 id="custom-domain-name-optional">Custom Domain Name (Optional)&lt;/h3>
-&lt;ol>
-&lt;li>Setting up DNS for Domain to allow GitHub Pages&lt;/li>
-&lt;/ol>
-&lt;ul>
-&lt;li>If using CloudFlare, login to your dashboard and select the Domain Name to use.
-&lt;ul>
-&lt;li>Go to DNS&lt;/li>
-&lt;li>Create an A record for each of the following IP address pointing back at your &lt;code>example.com&lt;/code> domain:&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">185.199.108.153
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">185.199.109.153
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">185.199.110.153
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">185.199.111.153
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ul>
-&lt;li>
-&lt;p>&lt;img src="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample2.png"
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="custom-domain-name-optional"&gt;Custom Domain Name (Optional)&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Setting up DNS for Domain to allow GitHub Pages&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;If using CloudFlare, login to your dashboard and select the Domain Name to use.
+&lt;ul&gt;
+&lt;li&gt;Go to DNS&lt;/li&gt;
+&lt;li&gt;Create an A record for each of the following IP address pointing back at your &lt;code&gt;example.com&lt;/code&gt; domain:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;185.199.108.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;185.199.109.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;185.199.110.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;185.199.111.153
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;img src="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample2.png"
 width="1272"
 height="1043"
-srcset="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample2_hu72ade8ad98b857802e52668072d377ce_85301_480x0_resize_box_3.png 480w, https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample2_hu72ade8ad98b857802e52668072d377ce_85301_1024x0_resize_box_3.png 1024w"
+srcset="https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample2_hu_4cc58ab08ed6c206.png 480w, https://cinderblock.github.io/p/hugo-gitpage-creating-a-free-website/gh-pagesexample2_hu_fd22f2be888b2d32.png 1024w"
 loading="lazy"
 alt="Pages Settings"
 class="gallery-image"
 data-flex-grow="121"
 data-flex-basis="292px"
->&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Do the same but for IPv6 by Creating AAAA records for the following:&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">2606:50c0:8000::153
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2606:50c0:8001::153
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2606:50c0:8002::153
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2606:50c0:8003::153
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ul>
-&lt;ol start="2">
-&lt;li>Modify config.toml file (Generated later with Hugo Setup)&lt;/li>
-&lt;/ol>
-&lt;ul>
-&lt;li>Once you create a Hugo server, it will generate a plethora of files. One of these is a config file. Edit it and change the &lt;code>baseurl&lt;/code> varaible to &lt;code>https://example.com/&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;ol start="3">
-&lt;li>Create Static site name file&lt;/li>
-&lt;/ol>
-&lt;ul>
-&lt;li>Again, once the Hugo site is created. There is a static folder. Navigate into it, create a file named CNAME. Add your Domain name to it and save it.&lt;/li>
-&lt;/ul>
-&lt;h2 id="setup-hugo">Setup Hugo&lt;/h2>
-&lt;p>I recommend to clone down the repository created earlier, and generate the Hugo site into that folder structure. This will make commiting changes easier, and much more straightforward for this section.&lt;/p>
-&lt;p>Setting up Hugo (There are a few extra steps compared to normal, due to the Theme I will be demonstrating requiring POSTCSS)&lt;/p>
-&lt;p>&lt;em>This example will cover conducting the setup in Linux&lt;/em>&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;p>Commands to Setup npm versioning (Should be V.14) - &lt;em>Necessary for PostCSS&lt;/em>&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt update
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install nodejs npm
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -sL https://deb.nodesource.com/setup_14.x &lt;span class="p">|&lt;/span> sudo -E bash -
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install nodejs
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ol>
-&lt;/li>
-&lt;li>
-&lt;p>Setup Hugo&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">wget https://github.com/gohugoio/hugo/releases/download/v0.98.0/hugo_extended_0.98.0_Linux-64bit.deb
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dpkg --install hugo_extended_0.98.0_Linux-64bit.deb
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ol>
-&lt;/li>
-&lt;li>
-&lt;p>Build site using Blist&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;span class="lnt">9
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo new site blist &lt;span class="c1"># Can rename blist as needed&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> blist
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/apvarun/blist-hugo-theme.git themes/blist
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp themes/blist/package.json ./package.json
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp themes/blist/package-lock.json ./package-lock.json
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm install
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm i -g postcss-cli &lt;span class="c1"># Necessary for PostCSS&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;theme = \&amp;#34;blist\&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; config.toml &lt;span class="c1"># Rename blist if you did so earlier&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">hugo serve &lt;span class="c1"># Starts the Hugo server based on Static information within directory ran&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;/li>
-&lt;/ol>
-&lt;/li>
-&lt;/ol>
-&lt;h2 id="picking-a-theme">Picking a Theme&lt;/h2>
-&lt;p>If you wish to use another theme, I recommend searching online for freely available themes. Generally there isn&amp;rsquo;t too much change for setup in variation between theme to theme.&lt;/p>
-&lt;h2 id="commit">Commit&lt;/h2>
-&lt;p>Now everytime you commit into the repository, it should update GH-Pages and populate the site!&lt;/p>
-&lt;h2 id="useful-resources">Useful Resources&lt;/h2>
-&lt;ul>
-&lt;li>&lt;a class="link" href="https://gohugo.io/" target="_blank" rel="noopener"
->Hugo&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://hugothemesfree.com/" target="_blank" rel="noopener"
->Hugo Themes&lt;/a>&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Do the same but for IPv6 by Creating AAAA records for the following:&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2606:50c0:8000::153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2606:50c0:8001::153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2606:50c0:8002::153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2606:50c0:8003::153
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Modify config.toml file (Generated later with Hugo Setup)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Once you create a Hugo server, it will generate a plethora of files. One of these is a config file. Edit it and change the &lt;code&gt;baseurl&lt;/code&gt; varaible to &lt;code&gt;https://example.com/&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;Create Static site name file&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Again, once the Hugo site is created. There is a static folder. Navigate into it, create a file named CNAME. Add your Domain name to it and save it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="setup-hugo"&gt;Setup Hugo&lt;/h2&gt;
+&lt;p&gt;I recommend to clone down the repository created earlier, and generate the Hugo site into that folder structure. This will make commiting changes easier, and much more straightforward for this section.&lt;/p&gt;
+&lt;p&gt;Setting up Hugo (There are a few extra steps compared to normal, due to the Theme I will be demonstrating requiring POSTCSS)&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;This example will cover conducting the setup in Linux&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Commands to Setup npm versioning (Should be V.14) - &lt;em&gt;Necessary for PostCSS&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install nodejs npm
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;curl -sL https://deb.nodesource.com/setup_14.x &lt;span class="p"&gt;|&lt;/span&gt; sudo -E bash -
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install nodejs
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Setup Hugo&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wget https://github.com/gohugoio/hugo/releases/download/v0.98.0/hugo_extended_0.98.0_Linux-64bit.deb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dpkg --install hugo_extended_0.98.0_Linux-64bit.deb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Build site using Blist&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;hugo new site blist &lt;span class="c1"&gt;# Can rename blist as needed&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; blist
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone https://github.com/apvarun/blist-hugo-theme.git themes/blist
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cp themes/blist/package.json ./package.json
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cp themes/blist/package-lock.json ./package-lock.json
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;npm install
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;npm i -g postcss-cli &lt;span class="c1"&gt;# Necessary for PostCSS&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;theme = \&amp;#34;blist\&amp;#34;&amp;#34;&lt;/span&gt; &amp;gt;&amp;gt; config.toml &lt;span class="c1"&gt;# Rename blist if you did so earlier&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;hugo serve &lt;span class="c1"&gt;# Starts the Hugo server based on Static information within directory ran&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="picking-a-theme"&gt;Picking a Theme&lt;/h2&gt;
+&lt;p&gt;If you wish to use another theme, I recommend searching online for freely available themes. Generally there isn&amp;rsquo;t too much change for setup in variation between theme to theme.&lt;/p&gt;
+&lt;h2 id="commit"&gt;Commit&lt;/h2&gt;
+&lt;p&gt;Now everytime you commit into the repository, it should update GH-Pages and populate the site!&lt;/p&gt;
+&lt;h2 id="useful-resources"&gt;Useful Resources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://gohugo.io/" target="_blank" rel="noopener"
+&gt;Hugo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://hugothemesfree.com/" target="_blank" rel="noopener"
+&gt;Hugo Themes&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
